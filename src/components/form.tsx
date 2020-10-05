@@ -5,14 +5,8 @@ import React, { FunctionComponent, useEffect, useRef, useState } from 'react'
 
 import { styled } from '../stitches.config'
 import { Board, Item, List } from '../types/graphql'
-import { Icon } from './icon'
 
 const Main = styled('form', {
-  alignItems: 'center',
-  display: 'flex'
-})
-
-const Content = styled('div', {
   display: 'flex',
   flexDirection: 'column',
   width: '100%'
@@ -126,41 +120,37 @@ export const Form: FunctionComponent<Props> = ({
         submit()
       }}
       ref={ref}>
-      <Content>
-        <Input
-          autoFocus={autoFocus}
-          onChange={(event) => setText(event.target.value)}
-          placeholder={placeholder}
-          type="text"
-          value={text}
-        />
-        {type === 'item' && (
-          <>
-            <Input
-              css={{
-                fontSize: '$small',
-                lineHeight: '$small',
-                marginTop: '$half'
-              }}
-              onChange={(event) => setReminder(event.target.value)}
-              placeholder="Add reminder: eg, tomorrow at noon"
-              type="text"
-              value={reminder}
-            />
-            {formatted && reminder !== formatted && <Date>{formatted}</Date>}
-          </>
-        )}
-      </Content>
-      {text && (
-        <Icon
-          css={{
-            cursor: 'pointer',
-            marginLeft: '$padding'
-          }}
-          icon="check"
-          onClick={submit}
-        />
+      <Input
+        autoFocus={autoFocus}
+        onChange={(event) => setText(event.target.value)}
+        placeholder={placeholder}
+        type="text"
+        value={text}
+      />
+      {type === 'item' && (
+        <>
+          <Input
+            css={{
+              fontSize: '$small',
+              lineHeight: '$small',
+              marginTop: '$half'
+            }}
+            onChange={(event) => setReminder(event.target.value)}
+            placeholder="Add reminder: eg, tomorrow at noon"
+            type="text"
+            value={reminder}
+          />
+          {formatted && reminder !== formatted && <Date>{formatted}</Date>}
+        </>
       )}
+      <input
+        style={{
+          bottom: '200%',
+          position: 'absolute',
+          right: '200%'
+        }}
+        type="submit"
+      />
     </Main>
   )
 }

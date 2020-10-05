@@ -9,7 +9,7 @@ import { Form } from './form'
 import { Icon } from './icon'
 
 const Main = styled('div', {
-  ':hover .actions': {
+  ':hover .item-actions': {
     opacity: 1
   },
 
@@ -78,8 +78,6 @@ export const ItemCard: FunctionComponent<Props> = ({ index, item, list }) => {
         item={item}
         onCancel={() => setEditing(false)}
         onItem={(body, reminder) => {
-          console.log('foo')
-
           updateItem(item, {
             body,
             reminder
@@ -102,7 +100,7 @@ export const ItemCard: FunctionComponent<Props> = ({ index, item, list }) => {
               <Reminder>{dayjs(item.reminder).format('lll')}</Reminder>
             )}
           </Todo>
-          <Actions className="actions">
+          <Actions className="item-actions">
             <Icon
               css={{
                 cursor: 'pointer'

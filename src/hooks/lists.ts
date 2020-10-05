@@ -8,9 +8,12 @@ import {
   Mutation,
   MutationCreateListArgs,
   MutationDeleteListArgs,
+  MutationUpdateListArgs,
   Query,
+  QueryBoardArgs,
   QueryListArgs
 } from '../types/graphql'
+import { BOARD } from './boards'
 
 const LISTS = gql`
   query lists {
@@ -114,13 +117,36 @@ export const useCreateList = (): CreateListReturns => {
           }
         },
         update(proxy, response) {
-          if (boardId) {
-            // TODO: add list to board
-
+          if (!response.data?.createList) {
             return
           }
 
-          if (!response.data?.createList) {
+          if (boardId) {
+            const options = {
+              query: BOARD,
+              variables: {
+                boardId
+              }
+            }
+
+            const data = proxy.readQuery<Pick<Query, 'board'>, QueryBoardArgs>(
+              options
+            )
+
+            if (!data) {
+              return
+            }
+
+            proxy.writeQuery({
+              ...options,
+              data: update(data, {
+                board: {
+                  lists: {
+                    $push: [response.data.createList]
+                  }
+                }
+              })
+            })
             return
           }
 
@@ -154,6 +180,51 @@ export const useCreateList = (): CreateListReturns => {
   return {
     createList,
     loading
+  }
+}
+
+export const UPDATE_LIST = gql`
+  mutation updateList($listId: Int!, $name: String!) {
+    updateList(listId: $listId, name: $name) {
+      id
+      name
+      createdAt
+    }
+  }
+`
+
+type UpdateListReturns = {
+  loading: boolean
+
+  updateList: (list: List, name: string) => Promise<unknown>
+}
+
+export const useUpdateList = (): UpdateListReturns => {
+  const [mutate, { loading }] = useMutation<
+    Pick<Mutation, 'updateList'>,
+    MutationUpdateListArgs
+  >(UPDATE_LIST)
+
+  const updateList = useCallback(
+    (list: List, name: string) =>
+      mutate({
+        optimisticResponse: {
+          updateList: {
+            ...list,
+            name
+          }
+        },
+        variables: {
+          listId: list.id,
+          name
+        }
+      }),
+    [mutate]
+  )
+
+  return {
+    loading,
+    updateList
   }
 }
 

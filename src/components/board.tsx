@@ -1,7 +1,12 @@
 import React, { FunctionComponent, useState } from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 
-import { useCreateItem, useCreateList, useDeleteList } from '../hooks'
+import {
+  useCreateItem,
+  useCreateList,
+  useDeleteList,
+  useUpdateList
+} from '../hooks'
 import { styled } from '../stitches.config'
 import { List } from '../types/graphql'
 import { Form } from './form'
@@ -19,6 +24,10 @@ const Content = styled('div', {
 })
 
 const Column = styled('div', {
+  ':hover .list-actions': {
+    opacity: 1
+  },
+
   marginLeft: '$margin',
   marginRight: '$margin',
   width: '$list'
@@ -34,28 +43,33 @@ const Header = styled('div', {
 
 const Title = styled('h2', {
   fontSize: '$subtitle',
-  fontWeight: '$medium'
+  fontWeight: '$medium',
+  lineHeight: '$subtitle'
 })
 
 const Actions = styled('div', {
   alignItems: 'center',
-  display: 'flex'
+  display: 'flex',
+  opacity: 0,
+  transition: '$smooth'
 })
 
 interface Props {
-  id?: number
+  boardId?: number
   lists: List[]
 }
 
-export const ItemBoard: FunctionComponent<Props> = ({ id, lists }) => {
+export const ItemBoard: FunctionComponent<Props> = ({ boardId, lists }) => {
   const { createList } = useCreateList()
+  const { updateList } = useUpdateList()
   const { deleteList } = useDeleteList()
 
   const { createItem } = useCreateItem()
 
   const [adding, setAdding] = useState(new Map())
+  const [editing, setEditing] = useState(new Map())
 
-  const toggle = (id: number) => {
+  const toggleAdding = (id: number) => {
     const next = new Map(adding)
 
     if (next.get(id)) {
@@ -67,6 +81,18 @@ export const ItemBoard: FunctionComponent<Props> = ({ id, lists }) => {
     setAdding(next)
   }
 
+  const toggleEditing = (id: number) => {
+    const next = new Map(editing)
+
+    if (next.get(id)) {
+      next.delete(id)
+    } else {
+      next.set(id, true)
+    }
+
+    setEditing(next)
+  }
+
   return (
     <Main>
       <DragDropContext
@@ -75,8 +101,7 @@ export const ItemBoard: FunctionComponent<Props> = ({ id, lists }) => {
         }}>
         <Droppable
           direction="horizontal"
-          droppableId={['board', id].filter(Boolean).join('-')}
-          isCombineEnabled={false}
+          droppableId={['board', boardId].filter(Boolean).join('-')}
           type="list">
           {({ droppableProps, innerRef, placeholder }) => (
             <Content
@@ -95,14 +120,38 @@ export const ItemBoard: FunctionComponent<Props> = ({ id, lists }) => {
                   {({ dragHandleProps, draggableProps, innerRef }) => (
                     <Column ref={innerRef} {...draggableProps}>
                       <Header {...dragHandleProps}>
-                        <Title>{list.name}</Title>
-                        <Actions>
+                        {editing.get(list.id) ? (
+                          <Form
+                            autoFocus
+                            css={{
+                              input: {
+                                fontSize: '$subtitle',
+                                fontWeight: '$medium',
+                                lineHeight: '$subtitle'
+                              }
+                            }}
+                            list={list}
+                            onCancel={() => toggleEditing(list.id)}
+                            onList={(name) => {
+                              updateList(list, name)
+
+                              toggleEditing(list.id)
+                            }}
+                            placeholder="Name"
+                            type="list"
+                          />
+                        ) : (
+                          <Title onClick={() => toggleEditing(list.id)}>
+                            {list.name}
+                          </Title>
+                        )}
+                        <Actions className="list-actions">
                           <Icon
                             css={{
                               cursor: 'pointer'
                             }}
                             icon={adding.get(list.id) ? 'cross' : 'add'}
-                            onClick={() => toggle(list.id)}
+                            onClick={() => toggleAdding(list.id)}
                           />
                           <Icon
                             css={{
@@ -122,14 +171,14 @@ export const ItemBoard: FunctionComponent<Props> = ({ id, lists }) => {
                               marginBottom: '$margin',
                               width: '$list'
                             }}
-                            onCancel={() => toggle(list.id)}
+                            onCancel={() => toggleAdding(list.id)}
                             onItem={(body, reminder) => {
                               createItem(list.id, {
                                 body,
                                 reminder
                               })
 
-                              toggle(list.id)
+                              toggleAdding(list.id)
                             }}
                             placeholder="New item"
                             type="item"
@@ -148,7 +197,7 @@ export const ItemBoard: FunctionComponent<Props> = ({ id, lists }) => {
                   marginRight: '$margin',
                   width: '$list'
                 }}
-                onList={(name) => createList(name, id)}
+                onList={(name) => createList(name, boardId)}
                 placeholder="New list"
                 type="list"
               />

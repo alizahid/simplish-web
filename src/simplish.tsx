@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom'
 
 import { Header } from './components'
 import { client } from './lib'
-import { Landing, Lists } from './scenes'
+import { Board, Boards, Landing, Lists } from './scenes'
 import { darkTheme, styled } from './stitches.config'
 import { useAuth } from './store'
 
@@ -39,6 +39,16 @@ export const Simplish: FunctionComponent = () => {
               <Route exact path="/">
                 <Landing />
               </Route>
+              {loggedIn && (
+                <Route exact path="/boards">
+                  <Boards />
+                </Route>
+              )}
+              {loggedIn && (
+                <Route path="/boards/:id">
+                  <Board />
+                </Route>
+              )}
               {loggedIn && (
                 <Route path="/lists">
                   <Lists />

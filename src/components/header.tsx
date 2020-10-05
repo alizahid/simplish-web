@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react'
-import { NavLink } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 
 import { styled } from '../stitches.config'
 import { useAuth } from '../store'
@@ -13,7 +13,7 @@ const Main = styled('header', {
   padding: '$space'
 })
 
-const Simplish = styled('div', {
+const Simplish = styled(Link, {
   alignItems: 'center',
   display: 'flex'
 })
@@ -37,7 +37,7 @@ const Nav = styled('nav', {
   display: 'flex'
 })
 
-const Link = styled(NavLink, {
+const Hyperlink = styled(NavLink, {
   '&.active, &:hover': {
     color: '$foreground'
   },
@@ -52,7 +52,7 @@ export const Header: FunctionComponent = () => {
 
   return (
     <Main>
-      <Simplish>
+      <Simplish to="/">
         <Logo />
         <Title>Simplish</Title>
       </Simplish>
@@ -66,9 +66,9 @@ export const Header: FunctionComponent = () => {
         />
         {loggedIn && (
           <>
-            <Link to="/lists">Lists</Link>
-            <Link to="/boards">Boards</Link>
-            <Link
+            <Hyperlink to="/lists">Lists</Hyperlink>
+            <Hyperlink to="/boards">Boards</Hyperlink>
+            <Hyperlink
               onClick={(event) => {
                 event.preventDefault()
 
@@ -76,7 +76,7 @@ export const Header: FunctionComponent = () => {
               }}
               to="/sign-out">
               Sign out
-            </Link>
+            </Hyperlink>
           </>
         )}
       </Nav>

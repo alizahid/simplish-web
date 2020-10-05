@@ -79,12 +79,14 @@ export type Comment = {
 export type Mutation = {
   __typename?: 'Mutation';
   createBoard: Board;
+  updateBoard: Board;
   deleteBoard: Scalars['Boolean'];
   createItem: Item;
   updateItem: Item;
   deleteItem: Scalars['Boolean'];
   toggleItem: Scalars['Boolean'];
   createList: List;
+  updateList: List;
   deleteList: Scalars['Boolean'];
   signIn: AuthResult;
   updatePushToken: Scalars['Boolean'];
@@ -93,6 +95,12 @@ export type Mutation = {
 
 export type MutationCreateBoardArgs = {
   name: Scalars['String'];
+};
+
+
+export type MutationUpdateBoardArgs = {
+  name: Scalars['String'];
+  boardId: Scalars['Int'];
 };
 
 
@@ -127,6 +135,12 @@ export type MutationToggleItemArgs = {
 export type MutationCreateListArgs = {
   boardId?: Maybe<Scalars['Int']>;
   name: Scalars['String'];
+};
+
+
+export type MutationUpdateListArgs = {
+  name: Scalars['String'];
+  listId: Scalars['Int'];
 };
 
 

@@ -24,7 +24,7 @@ export const ItemList: FunctionComponent<Props> = ({ children, id }) => {
   }
 
   return (
-    <Droppable droppableId={`list-${id}`} isCombineEnabled={false} type="item">
+    <Droppable droppableId={`list-${id}`} type="item">
       {({ droppableProps, innerRef, placeholder }) => (
         <div ref={innerRef} {...droppableProps}>
           <Main>
