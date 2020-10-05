@@ -64,7 +64,7 @@ export const Header: FunctionComponent = () => {
           icon={theme === 'dark' ? 'sun' : 'moon'}
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
         />
-        {loggedIn && (
+        {loggedIn ? (
           <>
             <Hyperlink to="/lists">Lists</Hyperlink>
             <Hyperlink to="/boards">Boards</Hyperlink>
@@ -78,6 +78,8 @@ export const Header: FunctionComponent = () => {
               Sign out
             </Hyperlink>
           </>
+        ) : (
+          <Hyperlink to="/sign-in">Sign in</Hyperlink>
         )}
       </Nav>
     </Main>
