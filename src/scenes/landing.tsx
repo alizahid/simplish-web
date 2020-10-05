@@ -4,15 +4,13 @@ import DocumentTitle from 'react-document-title'
 import { styled } from '../stitches.config'
 import { useAuth } from '../store'
 
-const Title = styled('h1', {
+const Title = styled('h2', {
+  ':first-child': {
+    marginTop: 0
+  },
+
   color: '$foreground',
   fontSize: '$title',
-  fontWeight: '$semibold'
-})
-
-const Subtitle = styled('h2', {
-  color: '$foreground',
-  fontSize: '$subtitle',
   fontWeight: '$semibold',
   marginTop: '$space'
 })
@@ -44,26 +42,29 @@ export const Landing: FunctionComponent = () => {
     <>
       <DocumentTitle title="Simplish" />
 
-      <Title>Dead simple lists</Title>
-      <Subtitle>Lists</Subtitle>
+      <Title>Lists</Title>
       <Copy>
         Simplish lists are beautiful and minimal. Your lists are stacked
         horizontally and you can drag and drop items across them.
       </Copy>
       <Image src={`/screenshots/${theme}-lists.png`} />
-      <Subtitle>Boards</Subtitle>
+      <Title>Boards</Title>
       <Copy>
         Simplish baords are collections of lists, like a kanban board.
       </Copy>
       <Image src={`/screenshots/${theme}-boards.png`} />
-      <Subtitle>Dark mode</Subtitle>
+      <Title>Collaboration</Title>
+      <Copy>Coming soon.</Copy>
+      <Title>Notes</Title>
+      <Copy>Coming soon.</Copy>
+      <Title>Code snippets</Title>
+      <Copy>Coming soon.</Copy>
+      <Title>Dark mode</Title>
       <Copy>
         It&apos;s 2020, so a dark mode is available. Switch from the top right
         menu.
       </Copy>
-      <Subtitle>Collaboration</Subtitle>
-      <Copy>Coming soon.</Copy>
-      <Subtitle>Mobile</Subtitle>
+      <Title>Mobile</Title>
       <Copy>
         The Simplish website doesn&apos;t support mobile browsers, but an app is
         in the works.
