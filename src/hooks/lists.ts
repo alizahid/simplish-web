@@ -94,7 +94,7 @@ export const CREATE_LIST = gql`
 type CreateListReturns = {
   loading: boolean
 
-  create: (name: string, boardId?: number) => Promise<unknown>
+  createList: (name: string, boardId?: number) => Promise<unknown>
 }
 
 export const useCreateList = (): CreateListReturns => {
@@ -103,7 +103,7 @@ export const useCreateList = (): CreateListReturns => {
     MutationCreateListArgs
   >(CREATE_LIST)
 
-  const create = useCallback(
+  const createList = useCallback(
     (name: string, boardId?: number) =>
       mutate({
         optimisticResponse: {
@@ -152,7 +152,7 @@ export const useCreateList = (): CreateListReturns => {
   )
 
   return {
-    create,
+    createList,
     loading
   }
 }
@@ -166,7 +166,7 @@ export const DELETE_LIST = gql`
 type DeleteListReturns = {
   loading: boolean
 
-  remove: (listId: number) => Promise<unknown>
+  deleteList: (listId: number) => Promise<unknown>
 }
 
 export const useDeleteList = (): DeleteListReturns => {
@@ -179,7 +179,7 @@ export const useDeleteList = (): DeleteListReturns => {
     }
   })
 
-  const remove = useCallback(
+  const deleteList = useCallback(
     async (listId: number) => {
       const yes = window.confirm('Are you sure you want to delete this list?')
 
@@ -219,7 +219,7 @@ export const useDeleteList = (): DeleteListReturns => {
   )
 
   return {
-    loading,
-    remove
+    deleteList,
+    loading
   }
 }

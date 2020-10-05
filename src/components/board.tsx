@@ -48,8 +48,8 @@ interface Props {
 }
 
 export const ItemBoard: FunctionComponent<Props> = ({ id, lists }) => {
-  const { create } = useCreateList()
-  const { remove } = useDeleteList()
+  const { createList } = useCreateList()
+  const { deleteList } = useDeleteList()
 
   const { createItem } = useCreateItem()
 
@@ -110,7 +110,7 @@ export const ItemBoard: FunctionComponent<Props> = ({ id, lists }) => {
                               marginLeft: '$padding'
                             }}
                             icon="remove"
-                            onClick={() => remove(list.id)}
+                            onClick={() => deleteList(list.id)}
                           />
                         </Actions>
                       </Header>
@@ -148,7 +148,7 @@ export const ItemBoard: FunctionComponent<Props> = ({ id, lists }) => {
                   marginRight: '$margin',
                   width: '$list'
                 }}
-                onList={(name) => create(name, id)}
+                onList={(name) => createList(name, id)}
                 placeholder="New list"
                 type="list"
               />

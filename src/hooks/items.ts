@@ -155,7 +155,7 @@ const DELETE_ITEM = gql`
 type DeleteItemReturns = {
   loading: boolean
 
-  remove: (listId: number, itemId: number) => Promise<unknown>
+  deleteItem: (listId: number, itemId: number) => Promise<unknown>
 }
 
 export const useDeleteItem = (): DeleteItemReturns => {
@@ -168,7 +168,7 @@ export const useDeleteItem = (): DeleteItemReturns => {
     }
   })
 
-  const remove = useCallback(
+  const deleteItem = useCallback(
     async (listId: number, itemId: number) => {
       const yes = window.confirm('Are you sure you want to delete this item?')
 
@@ -219,8 +219,8 @@ export const useDeleteItem = (): DeleteItemReturns => {
   )
 
   return {
-    loading,
-    remove
+    deleteItem,
+    loading
   }
 }
 
@@ -233,7 +233,7 @@ const TOGGLE_ITEM = gql`
 type ToggleItemReturns = {
   loading: boolean
 
-  toggle: (
+  toggleItem: (
     listId: number,
     itemId: number,
     complete: boolean
@@ -250,7 +250,7 @@ export const useToggleItem = (): ToggleItemReturns => {
     }
   })
 
-  const toggle = useCallback(
+  const toggleItem = useCallback(
     (listId: number, itemId: number, complete: boolean) =>
       mutate({
         update(proxy) {
@@ -300,6 +300,6 @@ export const useToggleItem = (): ToggleItemReturns => {
 
   return {
     loading,
-    toggle
+    toggleItem
   }
 }

@@ -62,8 +62,8 @@ interface Props {
 }
 
 export const ItemCard: FunctionComponent<Props> = ({ index, item, list }) => {
-  const { remove } = useDeleteItem()
-  const { toggle } = useToggleItem()
+  const { deleteItem } = useDeleteItem()
+  const { toggleItem } = useToggleItem()
   const { updateItem } = useUpdateItem()
 
   const [editing, setEditing] = useState(false)
@@ -108,7 +108,7 @@ export const ItemCard: FunctionComponent<Props> = ({ index, item, list }) => {
                 cursor: 'pointer'
               }}
               icon={item.complete ? 'cross' : 'check'}
-              onClick={() => toggle(list.id, item.id, !item.complete)}
+              onClick={() => toggleItem(list.id, item.id, !item.complete)}
             />
             <Icon
               css={{
@@ -116,7 +116,7 @@ export const ItemCard: FunctionComponent<Props> = ({ index, item, list }) => {
                 marginLeft: '$half'
               }}
               icon="remove"
-              onClick={() => remove(list.id, item.id)}
+              onClick={() => deleteItem(list.id, item.id)}
             />
           </Actions>
         </Main>

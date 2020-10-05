@@ -23,7 +23,7 @@ const Page = styled('main', {
 })
 
 export const Simplish: FunctionComponent = () => {
-  const [{ theme }] = useAuth()
+  const [{ loggedIn, theme }] = useAuth()
 
   useEffect(() => {
     document.body.className = theme === 'dark' ? darkTheme : ''
@@ -39,9 +39,11 @@ export const Simplish: FunctionComponent = () => {
               <Route exact path="/">
                 <Landing />
               </Route>
-              <Route path="/lists">
-                <Lists />
-              </Route>
+              {loggedIn && (
+                <Route path="/lists">
+                  <Lists />
+                </Route>
+              )}
             </Switch>
           </Page>
         </Layout>

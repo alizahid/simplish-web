@@ -7,8 +7,8 @@ export const { css, styled } = createStyled({
       $thin: '1px'
     },
     colors: {
-      $background: '#fff',
-      $backgroundDark: '#eee',
+      $background: '#eee',
+      $backgroundDark: '#ccc',
       $error: '#ff3b30',
       $foreground: '#000',
       $foregroundLight: '#666',
