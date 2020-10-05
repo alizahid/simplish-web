@@ -39,7 +39,7 @@ interface Props {
 
   onBoard?: (text: string) => void
   onCancel?: () => void
-  onItem?: (text: string, reminder?: string) => void
+  onItem?: (text: string, date?: string) => void
   onList?: (text: string) => void
 }
 
@@ -59,8 +59,8 @@ export const Form: FunctionComponent<Props> = ({
   const [text, setText] = useState(
     board?.name ?? item?.body ?? list?.name ?? ''
   )
-  const [reminder, setReminder] = useState(
-    item?.reminder ? dayjs(item.reminder).format('lll') : ''
+  const [date, setDate] = useState(
+    item?.date ? dayjs(item.date).format('lll') : ''
   )
 
   const ref = useRef<HTMLFormElement>(null)
@@ -83,8 +83,8 @@ export const Form: FunctionComponent<Props> = ({
     }
   }, [onCancel])
 
-  const date = parseDate(reminder)
-  const formatted = date ? dayjs(date).format('lll') : undefined
+  const parsed = parseDate(date)
+  const formatted = parsed ? dayjs(parsed).format('lll') : undefined
 
   const submit = () => {
     if (!text) {
@@ -98,10 +98,10 @@ export const Form: FunctionComponent<Props> = ({
     }
 
     if (type === 'item' && onItem) {
-      onItem(text, date ? dayjs(date).toISOString() : undefined)
+      onItem(text, parsed ? dayjs(parsed).toISOString() : undefined)
 
       setText('')
-      setReminder('')
+      setDate('')
     }
 
     if (type === 'list' && onList) {
@@ -135,12 +135,12 @@ export const Form: FunctionComponent<Props> = ({
               lineHeight: '$small',
               marginTop: '$half'
             }}
-            onChange={(event) => setReminder(event.target.value)}
-            placeholder="Add reminder: eg, tomorrow at noon"
+            onChange={(event) => setDate(event.target.value)}
+            placeholder="Add date: eg, tomorrow at noon"
             type="text"
-            value={reminder}
+            value={date}
           />
-          {formatted && reminder !== formatted && <Date>{formatted}</Date>}
+          {formatted && date !== formatted && <Date>{formatted}</Date>}
         </>
       )}
       <input

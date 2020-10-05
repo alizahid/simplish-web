@@ -38,7 +38,7 @@ const Body = styled('div', {
   lineHeight: '$regular'
 })
 
-const Reminder = styled('div', {
+const Date = styled('div', {
   color: '$foregroundLight',
   fontSize: '$small',
   lineHeight: '$small',
@@ -77,10 +77,10 @@ export const ItemCard: FunctionComponent<Props> = ({ index, item, list }) => {
         }}
         item={item}
         onCancel={() => setEditing(false)}
-        onItem={(body, reminder) => {
+        onItem={(body, date) => {
           updateItem(item, {
             body,
-            reminder
+            date
           })
 
           setEditing(false)
@@ -96,9 +96,7 @@ export const ItemCard: FunctionComponent<Props> = ({ index, item, list }) => {
         <Main ref={innerRef} {...draggableProps} {...dragHandleProps}>
           <Todo complete={item.complete} onClick={() => setEditing(true)}>
             <Body>{item.body}</Body>
-            {item.reminder && (
-              <Reminder>{dayjs(item.reminder).format('lll')}</Reminder>
-            )}
+            {item.date && <Date>{dayjs(item.date).format('lll')}</Date>}
           </Todo>
           <Actions className="item-actions">
             <Icon

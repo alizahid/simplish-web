@@ -172,10 +172,10 @@ export const ItemBoard: FunctionComponent<Props> = ({ boardId, lists }) => {
                               width: '$list'
                             }}
                             onCancel={() => toggleAdding(list.id)}
-                            onItem={(body, reminder) => {
+                            onItem={(body, date) => {
                               createItem(list.id, {
                                 body,
-                                reminder
+                                date
                               })
 
                               toggleAdding(list.id)

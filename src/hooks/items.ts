@@ -23,7 +23,7 @@ const CREATE_ITEM = gql`
       body
       complete
       description
-      reminder
+      date
       createdAt
     }
   }
@@ -105,7 +105,7 @@ const UPDATE_ITEM = gql`
       body
       complete
       description
-      reminder
+      date
       createdAt
     }
   }

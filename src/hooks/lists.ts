@@ -53,7 +53,7 @@ export const LIST = gql`
         body
         complete
         description
-        reminder
+        date
         createdAt
       }
     }

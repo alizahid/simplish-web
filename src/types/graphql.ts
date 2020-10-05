@@ -52,7 +52,7 @@ export type Item = {
   body: Scalars['String'];
   complete: Scalars['Boolean'];
   description?: Maybe<Scalars['String']>;
-  reminder?: Maybe<Scalars['DateTime']>;
+  date?: Maybe<Scalars['DateTime']>;
   assignees?: Maybe<Array<User>>;
   comments?: Maybe<Array<Comment>>;
   user?: Maybe<User>;
@@ -161,7 +161,7 @@ export type MutationUpdatePushTokenArgs = {
 export type ItemInput = {
   body: Scalars['String'];
   description?: Maybe<Scalars['String']>;
-  reminder?: Maybe<Scalars['String']>;
+  date?: Maybe<Scalars['String']>;
 };
 
 export type AuthResult = {
