@@ -57,59 +57,60 @@ export const Boards: FunctionComponent = () => {
   }
 
   return (
-    <DocumentTitle title="Boards / Simplish">
-      <div>
-        {boards.map((board) => (
-          <Item key={board.id}>
-            {editing.get(board.id) ? (
-              <Form
-                autoFocus
-                board={board}
-                css={{
-                  lineHeight: '$regular',
-                  width: '$list'
-                }}
-                onBoard={(name) => {
-                  updateBoard(board, name)
+    <>
+      <DocumentTitle title="Boards / Simplish" />
 
-                  toggleEditing(board.id)
-                }}
-                onCancel={() => toggleEditing(board.id)}
-                placeholder="Name"
-                type="board"
-              />
-            ) : (
-              <Link to={`/boards/${board.id}`}>{board.name}</Link>
-            )}
-            <Actions>
-              <Icon
-                css={{
-                  cursor: 'pointer',
-                  marginLeft: '$padding'
-                }}
-                icon="edit"
-                onClick={() => toggleEditing(board.id)}
-              />
-              <Icon
-                css={{
-                  cursor: 'pointer',
-                  marginLeft: '$padding'
-                }}
-                icon="remove"
-                onClick={() => deleteBoard(board.id)}
-              />
-            </Actions>
-          </Item>
-        ))}
-        <Form
-          css={{
-            width: '$list'
-          }}
-          onBoard={(name) => createBoard(name)}
-          placeholder="New board"
-          type="board"
-        />
-      </div>
-    </DocumentTitle>
+      {boards.map((board) => (
+        <Item key={board.id}>
+          {editing.get(board.id) ? (
+            <Form
+              autoFocus
+              board={board}
+              css={{
+                lineHeight: '$regular',
+                width: '$list'
+              }}
+              onBoard={(name) => {
+                updateBoard(board, name)
+
+                toggleEditing(board.id)
+              }}
+              onCancel={() => toggleEditing(board.id)}
+              placeholder="Name"
+              type="board"
+            />
+          ) : (
+            <Link to={`/boards/${board.id}`}>{board.name}</Link>
+          )}
+          <Actions>
+            <Icon
+              css={{
+                cursor: 'pointer',
+                marginLeft: '$padding'
+              }}
+              icon="edit"
+              onClick={() => toggleEditing(board.id)}
+            />
+            <Icon
+              css={{
+                cursor: 'pointer',
+                marginLeft: '$padding'
+              }}
+              icon="remove"
+              onClick={() => deleteBoard(board.id)}
+            />
+          </Actions>
+        </Item>
+      ))}
+
+      <Form
+        css={{
+          width: '$list'
+        }}
+        onBoard={(name) => createBoard(name)}
+        placeholder="New board"
+        type="board"
+      />
+    </>
   )
 }
