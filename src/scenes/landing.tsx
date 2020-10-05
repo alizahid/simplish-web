@@ -47,12 +47,12 @@ export const Landing: FunctionComponent = () => {
         Simplish lists are beautiful and minimal. Your lists are stacked
         horizontally and you can drag and drop items across them.
       </Copy>
-      <Image src={`/screenshots/${theme}-lists.png`} />
+      <Image alt="Lists" src={`/screenshots/${theme}-lists.png`} />
       <Title>Boards</Title>
       <Copy>
         Simplish baords are collections of lists, like a kanban board.
       </Copy>
-      <Image src={`/screenshots/${theme}-boards.png`} />
+      <Image alt="Boards" src={`/screenshots/${theme}-boards.png`} />
       <Title>Collaboration</Title>
       <Copy>Coming soon.</Copy>
       <Title>Notes</Title>
@@ -73,6 +73,7 @@ export const Landing: FunctionComponent = () => {
       <Footer>
         &copy; {new Date().getFullYear()} / Built with
         <img
+          alt="Heart"
           src="/heart.svg"
           style={{
             height: '1.5rem',
@@ -85,7 +86,7 @@ export const Landing: FunctionComponent = () => {
         by
         <a
           href="https://alizahid.dev"
-          rel="noreferrer"
+          rel="noopener noreferrer"
           style={{
             marginLeft: '0.25rem'
           }}
