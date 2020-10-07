@@ -1,5 +1,4 @@
 import React, { FunctionComponent } from 'react'
-import DocumentTitle from 'react-document-title'
 
 import { styled } from '../stitches.config'
 import { useAuth } from '../store'
@@ -40,8 +39,6 @@ export const Landing: FunctionComponent = () => {
 
   return (
     <>
-      <DocumentTitle title="Simplish" />
-
       <Title>Lists</Title>
       <Copy>
         Simplish lists are beautiful and minimal. Your lists are stacked

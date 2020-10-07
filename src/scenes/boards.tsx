@@ -1,5 +1,4 @@
 import React, { FunctionComponent, useState } from 'react'
-import DocumentTitle from 'react-document-title'
 import { Link } from 'react-router-dom'
 
 import { Form, Icon, Spinner } from '../components'
@@ -7,6 +6,7 @@ import {
   useBoards,
   useCreateBoard,
   useDeleteBoard,
+  usePageTitle,
   useUpdateBoard
 } from '../hooks'
 import { styled } from '../stitches.config'
@@ -32,6 +32,8 @@ const Actions = styled('div', {
 })
 
 export const Boards: FunctionComponent = () => {
+  usePageTitle('Boards / Simplish')
+
   const { boards, loading } = useBoards()
 
   const { createBoard } = useCreateBoard()
@@ -58,8 +60,6 @@ export const Boards: FunctionComponent = () => {
 
   return (
     <>
-      <DocumentTitle title="Boards / Simplish" />
-
       {boards.map((board) => (
         <Item key={board.id}>
           {editing.get(board.id) ? (
