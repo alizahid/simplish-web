@@ -5,8 +5,13 @@ import {
   useCreateItem,
   useCreateList,
   useDeleteList,
+  useMoveItem,
+  useReorderBoard,
+  useReorderList,
+  useReorderLists,
   useUpdateList
 } from '../hooks'
+import { helpers } from '../lib'
 import { styled } from '../stitches.config'
 import { List } from '../types/graphql'
 import { Form } from './form'
@@ -65,6 +70,11 @@ export const ItemBoard: FunctionComponent<Props> = ({ boardId, lists }) => {
   const { deleteList } = useDeleteList()
 
   const { createItem } = useCreateItem()
+  const { moveItem } = useMoveItem()
+
+  const { reorderBoard } = useReorderBoard()
+  const { reorderList } = useReorderList()
+  const { reorderLists } = useReorderLists()
 
   const [adding, setAdding] = useState(new Map())
   const [editing, setEditing] = useState(new Map())
@@ -96,8 +106,46 @@ export const ItemBoard: FunctionComponent<Props> = ({ boardId, lists }) => {
   return (
     <Main>
       <DragDropContext
-        onDragEnd={(drop) => {
-          console.log('drop', drop)
+        onDragEnd={({ destination, draggableId, source, type }) => {
+          if (!destination) {
+            return
+          }
+
+          if (
+            source.index === destination.index &&
+            source.droppableId === destination.droppableId
+          ) {
+            return
+          }
+
+          if (type === 'item') {
+            const fromListId = helpers.getListId(source.droppableId)
+            const toListId = helpers.getListId(destination.droppableId)
+
+            const fromIndex = source.index
+            const toIndex = destination.index
+
+            if (fromListId === toListId) {
+              reorderList(fromListId, fromIndex, toIndex)
+            } else {
+              const itemId = helpers.getItemId(draggableId)
+
+              moveItem(itemId, fromListId, toListId, fromIndex, toIndex)
+            }
+          }
+
+          if (type === 'list') {
+            const boardId = helpers.getBoardId(destination.droppableId)
+
+            const fromIndex = source.index
+            const toIndex = destination.index
+
+            if (boardId === 0) {
+              reorderLists(fromIndex, toIndex)
+            } else {
+              reorderBoard(boardId, fromIndex, toIndex)
+            }
+          }
         }}>
         <Droppable
           direction="horizontal"

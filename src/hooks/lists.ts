@@ -1,13 +1,16 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
 import dayjs from 'dayjs'
 import update from 'immutability-helper'
+import { cloneDeep } from 'lodash'
 import { useCallback } from 'react'
 
+import { client, helpers } from '../lib'
 import {
   List,
   Mutation,
   MutationCreateListArgs,
   MutationDeleteListArgs,
+  MutationReorderListArgs,
   MutationUpdateListArgs,
   Query,
   QueryBoardArgs,
@@ -15,7 +18,7 @@ import {
 } from '../types/graphql'
 import { BOARD } from './boards'
 
-const LISTS = gql`
+export const LISTS = gql`
   query lists {
     lists {
       id
@@ -84,7 +87,7 @@ export const useList = (listId: number): ListReturns => {
   }
 }
 
-export const CREATE_LIST = gql`
+const CREATE_LIST = gql`
   mutation createList($name: String!, $boardId: Int) {
     createList(name: $name, boardId: $boardId) {
       id
@@ -183,7 +186,7 @@ export const useCreateList = (): CreateListReturns => {
   }
 }
 
-export const UPDATE_LIST = gql`
+const UPDATE_LIST = gql`
   mutation updateList($listId: Int!, $name: String!) {
     updateList(listId: $listId, name: $name) {
       id
@@ -228,7 +231,7 @@ export const useUpdateList = (): UpdateListReturns => {
   }
 }
 
-export const DELETE_LIST = gql`
+const DELETE_LIST = gql`
   mutation deleteList($listId: Int!) {
     deleteList(listId: $listId)
   }
@@ -292,5 +295,85 @@ export const useDeleteList = (): DeleteListReturns => {
   return {
     deleteList,
     loading
+  }
+}
+
+const REORDER_LIST = gql`
+  mutation reorderList($listId: Int!, $order: [Int!]!) {
+    reorderList(listId: $listId, order: $order)
+  }
+`
+
+type ReorderListReturns = {
+  loading: boolean
+
+  reorderList: (
+    listId: number,
+    fromIndex: number,
+    toIndex: number
+  ) => Promise<unknown>
+}
+
+export const useReorderList = (): ReorderListReturns => {
+  const [mutate, { loading }] = useMutation<
+    Pick<Mutation, 'reorderList'>,
+    MutationReorderListArgs
+  >(REORDER_LIST, {
+    optimisticResponse: {
+      reorderList: true
+    }
+  })
+
+  const reorderList = useCallback(
+    async (listId: number, fromIndex: number, toIndex: number) => {
+      const list = client.readQuery<Pick<Query, 'list'>, QueryListArgs>({
+        query: LIST,
+        variables: {
+          listId
+        }
+      })
+
+      if (!list?.list.items) {
+        return
+      }
+
+      const item = cloneDeep(list.list.items[fromIndex])
+
+      const next = helpers.addItemToList(
+        helpers.removeItemFromList(list.list, fromIndex),
+        item,
+        toIndex
+      )
+
+      const order = next.items?.map(({ id }) => id)
+
+      if (!order) {
+        return
+      }
+
+      return mutate({
+        update(proxy) {
+          proxy.writeQuery({
+            data: {
+              list: next
+            },
+            query: LIST,
+            variables: {
+              listId: listId
+            }
+          })
+        },
+        variables: {
+          listId,
+          order
+        }
+      })
+    },
+    [mutate]
+  )
+
+  return {
+    loading,
+    reorderList
   }
 }

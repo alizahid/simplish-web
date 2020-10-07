@@ -1,13 +1,16 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
 import dayjs from 'dayjs'
 import update from 'immutability-helper'
+import { cloneDeep } from 'lodash'
 import { useCallback } from 'react'
 
+import { client, helpers } from '../lib'
 import {
   Board,
   Mutation,
   MutationCreateBoardArgs,
   MutationDeleteBoardArgs,
+  MutationReorderBoardArgs,
   MutationUpdateBoardArgs,
   Query,
   QueryBoardArgs
@@ -79,7 +82,7 @@ export const useBoard = (boardId: number): BoardReturns => {
   }
 }
 
-export const CREATE_BOARD = gql`
+const CREATE_BOARD = gql`
   mutation createBoard($name: String!) {
     createBoard(name: $name) {
       id
@@ -148,7 +151,7 @@ export const useCreateBoard = (): CreateBoardReturns => {
   }
 }
 
-export const UPDATE_BOARD = gql`
+const UPDATE_BOARD = gql`
   mutation updateBoard($boardId: Int!, $name: String!) {
     updateBoard(boardId: $boardId, name: $name) {
       id
@@ -193,7 +196,7 @@ export const useUpdateBoard = (): UpdateBoardReturns => {
   }
 }
 
-export const DELETE_BOARD = gql`
+const DELETE_BOARD = gql`
   mutation deleteBoard($boardId: Int!) {
     deleteBoard(boardId: $boardId)
   }
@@ -257,5 +260,85 @@ export const useDeleteBoard = (): DeleteBoardReturns => {
   return {
     deleteBoard,
     loading
+  }
+}
+
+const REORDER_BOARD = gql`
+  mutation reorderBoard($boardId: Int!, $order: [Int!]!) {
+    reorderBoard(boardId: $boardId, order: $order)
+  }
+`
+
+type ReorderBoardReturns = {
+  loading: boolean
+
+  reorderBoard: (
+    boardId: number,
+    fromIndex: number,
+    toIndex: number
+  ) => Promise<unknown>
+}
+
+export const useReorderBoard = (): ReorderBoardReturns => {
+  const [mutate, { loading }] = useMutation<
+    Pick<Mutation, 'reorderBoard'>,
+    MutationReorderBoardArgs
+  >(REORDER_BOARD, {
+    optimisticResponse: {
+      reorderBoard: true
+    }
+  })
+
+  const reorderBoard = useCallback(
+    async (boardId: number, fromIndex: number, toIndex: number) => {
+      const board = client.readQuery<Pick<Query, 'board'>, QueryBoardArgs>({
+        query: BOARD,
+        variables: {
+          boardId
+        }
+      })
+
+      if (!board?.board.lists) {
+        return
+      }
+
+      const list = cloneDeep(board.board.lists[fromIndex])
+
+      const next = helpers.addListToBoard(
+        helpers.removeListFromBoard(board.board, fromIndex),
+        list,
+        toIndex
+      )
+
+      const order = next.lists?.map(({ id }) => id)
+
+      if (!order) {
+        return
+      }
+
+      return mutate({
+        update(proxy) {
+          proxy.writeQuery({
+            data: {
+              board: next
+            },
+            query: BOARD,
+            variables: {
+              boardId
+            }
+          })
+        },
+        variables: {
+          boardId,
+          order
+        }
+      })
+    },
+    [mutate]
+  )
+
+  return {
+    loading,
+    reorderBoard
   }
 }

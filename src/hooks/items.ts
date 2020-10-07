@@ -1,14 +1,17 @@
 import { gql, useMutation } from '@apollo/client'
 import dayjs from 'dayjs'
 import update from 'immutability-helper'
+import { cloneDeep } from 'lodash'
 import { useCallback } from 'react'
 
+import { client, helpers } from '../lib'
 import {
   Item,
   ItemInput,
   Mutation,
   MutationCreateItemArgs,
   MutationDeleteItemArgs,
+  MutationMoveItemArgs,
   MutationToggleItemArgs,
   MutationUpdateItemArgs,
   Query,
@@ -301,5 +304,127 @@ export const useToggleItem = (): ToggleItemReturns => {
   return {
     loading,
     toggleItem
+  }
+}
+
+const MOVE_ITEM = gql`
+  mutation moveItem(
+    $itemId: Int!
+    $fromListId: Int!
+    $toListId: Int!
+    $fromOrder: [Int!]!
+    $toOrder: [Int!]!
+  ) {
+    moveItem(
+      itemId: $itemId
+      fromListId: $fromListId
+      toListId: $toListId
+      fromOrder: $fromOrder
+      toOrder: $toOrder
+    )
+  }
+`
+
+type MoveItemReturns = {
+  loading: boolean
+
+  moveItem: (
+    itemId: number,
+    fromListId: number,
+    toListId: number,
+    fromIndex: number,
+    toIndex: number
+  ) => Promise<unknown>
+}
+
+export const useMoveItem = (): MoveItemReturns => {
+  const [mutate, { loading }] = useMutation<
+    Pick<Mutation, 'moveItem'>,
+    MutationMoveItemArgs
+  >(MOVE_ITEM, {
+    optimisticResponse: {
+      moveItem: true
+    }
+  })
+
+  const moveItem = useCallback(
+    async (
+      itemId: number,
+      fromListId: number,
+      toListId: number,
+      fromIndex: number,
+      toIndex: number
+    ) => {
+      const fromList = client.readQuery<Pick<Query, 'list'>, QueryListArgs>({
+        query: LIST,
+        variables: {
+          listId: fromListId
+        }
+      })
+
+      if (!fromList?.list.items) {
+        return
+      }
+
+      const toList = client.readQuery<Pick<Query, 'list'>, QueryListArgs>({
+        query: LIST,
+        variables: {
+          listId: toListId
+        }
+      })
+
+      if (!toList?.list.items) {
+        return
+      }
+
+      const item = cloneDeep(fromList.list.items[fromIndex])
+
+      const nextFromList = helpers.removeItemFromList(fromList.list, fromIndex)
+      const nextToList = helpers.addItemToList(toList.list, item, toIndex)
+
+      const fromOrder = nextFromList.items?.map(({ id }) => id)
+      const toOrder = nextToList.items?.map(({ id }) => id)
+
+      if (!fromOrder || !toOrder) {
+        return
+      }
+
+      return mutate({
+        update(proxy) {
+          proxy.writeQuery({
+            data: {
+              list: nextFromList
+            },
+            query: LIST,
+            variables: {
+              listId: fromListId
+            }
+          })
+
+          proxy.writeQuery({
+            data: {
+              list: nextToList
+            },
+            query: LIST,
+            variables: {
+              listId: toListId
+            }
+          })
+        },
+        variables: {
+          fromListId,
+          fromOrder,
+          itemId,
+          toListId,
+          toOrder
+        }
+      })
+    },
+    [mutate]
+  )
+
+  return {
+    loading,
+    moveItem
   }
 }

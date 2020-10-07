@@ -81,15 +81,19 @@ export type Mutation = {
   createBoard: Board;
   updateBoard: Board;
   deleteBoard: Scalars['Boolean'];
+  reorderBoard: Scalars['Boolean'];
   createItem: Item;
   updateItem: Item;
   deleteItem: Scalars['Boolean'];
   toggleItem: Scalars['Boolean'];
+  moveItem: Scalars['Boolean'];
   createList: List;
   updateList: List;
   deleteList: Scalars['Boolean'];
+  reorderList: Scalars['Boolean'];
   signIn: AuthResult;
   updatePushToken: Scalars['Boolean'];
+  reorderLists: Scalars['Boolean'];
 };
 
 
@@ -105,6 +109,12 @@ export type MutationUpdateBoardArgs = {
 
 
 export type MutationDeleteBoardArgs = {
+  boardId: Scalars['Int'];
+};
+
+
+export type MutationReorderBoardArgs = {
+  order: Array<Scalars['Int']>;
   boardId: Scalars['Int'];
 };
 
@@ -132,6 +142,15 @@ export type MutationToggleItemArgs = {
 };
 
 
+export type MutationMoveItemArgs = {
+  toOrder: Array<Scalars['Int']>;
+  fromOrder: Array<Scalars['Int']>;
+  toListId: Scalars['Int'];
+  fromListId: Scalars['Int'];
+  itemId: Scalars['Int'];
+};
+
+
 export type MutationCreateListArgs = {
   boardId?: Maybe<Scalars['Int']>;
   name: Scalars['String'];
@@ -149,6 +168,12 @@ export type MutationDeleteListArgs = {
 };
 
 
+export type MutationReorderListArgs = {
+  order: Array<Scalars['Int']>;
+  listId: Scalars['Int'];
+};
+
+
 export type MutationSignInArgs = {
   token: Scalars['String'];
 };
@@ -156,6 +181,11 @@ export type MutationSignInArgs = {
 
 export type MutationUpdatePushTokenArgs = {
   token: Scalars['String'];
+};
+
+
+export type MutationReorderListsArgs = {
+  order: Array<Scalars['Int']>;
 };
 
 export type ItemInput = {
