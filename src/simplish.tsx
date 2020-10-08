@@ -10,8 +10,7 @@ import { useAuth } from './store'
 
 const Layout = styled('div', {
   display: 'flex',
-  flexDirection: 'column',
-  minHeight: '100vh'
+  flexDirection: 'column'
 })
 
 const Page = styled('main', {
