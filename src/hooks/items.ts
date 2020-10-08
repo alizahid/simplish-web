@@ -1,4 +1,4 @@
-import { gql, useMutation } from '@apollo/client'
+import { gql, useMutation, useQuery } from '@apollo/client'
 import dayjs from 'dayjs'
 import update from 'immutability-helper'
 import { cloneDeep } from 'lodash'
@@ -15,9 +15,42 @@ import {
   MutationToggleItemArgs,
   MutationUpdateItemArgs,
   Query,
-  QueryListArgs
+  QueryItemsArgs
 } from '../types/graphql'
-import { LIST } from './lists'
+
+export const ITEMS = gql`
+  query items($listId: Int!) {
+    items(listId: $listId) {
+      id
+      body
+      complete
+      description
+      date
+      createdAt
+    }
+  }
+`
+
+type ItemsReturns = {
+  items: Item[]
+  loading: boolean
+}
+
+export const useItems = (listId: number): ItemsReturns => {
+  const { data, loading } = useQuery<Pick<Query, 'items'>, QueryItemsArgs>(
+    ITEMS,
+    {
+      variables: {
+        listId
+      }
+    }
+  )
+
+  return {
+    items: data?.items ?? [],
+    loading
+  }
+}
 
 const CREATE_ITEM = gql`
   mutation createItem($listId: Int!, $data: ItemInput!) {
@@ -49,10 +82,12 @@ export const useCreateItem = (): CreateItemReturns => {
       mutate({
         optimisticResponse: {
           createItem: {
-            ...data,
+            body: data.body,
             complete: false,
             createdAt: dayjs().toISOString(),
-            id: Math.round(Math.random() * 1000),
+            date: data.date ?? null,
+            description: data.description ?? null,
+            id: 0,
             updatedAt: dayjs().toISOString()
           }
         },
@@ -62,13 +97,13 @@ export const useCreateItem = (): CreateItemReturns => {
           }
 
           const options = {
-            query: LIST,
+            query: ITEMS,
             variables: {
               listId
             }
           }
 
-          const data = proxy.readQuery<Pick<Query, 'list'>, QueryListArgs>(
+          const data = proxy.readQuery<Pick<Query, 'items'>, QueryItemsArgs>(
             options
           )
 
@@ -79,10 +114,8 @@ export const useCreateItem = (): CreateItemReturns => {
           proxy.writeQuery({
             ...options,
             data: update(data, {
-              list: {
-                items: {
-                  $unshift: [response.data.createItem]
-                }
+              items: {
+                $unshift: [response.data.createItem]
               }
             })
           })
@@ -182,13 +215,13 @@ export const useDeleteItem = (): DeleteItemReturns => {
       return mutate({
         update(proxy) {
           const options = {
-            query: LIST,
+            query: ITEMS,
             variables: {
               listId
             }
           }
 
-          const data = proxy.readQuery<Pick<Query, 'list'>, QueryListArgs>(
+          const data = proxy.readQuery<Pick<Query, 'items'>, QueryItemsArgs>(
             options
           )
 
@@ -196,7 +229,7 @@ export const useDeleteItem = (): DeleteItemReturns => {
             return
           }
 
-          const index = data.list.items?.findIndex(({ id }) => id === itemId)
+          const index = data.items.findIndex(({ id }) => id === itemId)
 
           if (index === undefined) {
             return
@@ -205,10 +238,8 @@ export const useDeleteItem = (): DeleteItemReturns => {
           proxy.writeQuery({
             ...options,
             data: update(data, {
-              list: {
-                items: {
-                  $splice: [[index, 1]]
-                }
+              items: {
+                $splice: [[index, 1]]
               }
             })
           })
@@ -258,13 +289,13 @@ export const useToggleItem = (): ToggleItemReturns => {
       mutate({
         update(proxy) {
           const options = {
-            query: LIST,
+            query: ITEMS,
             variables: {
               listId
             }
           }
 
-          const data = proxy.readQuery<Pick<Query, 'list'>, QueryListArgs>(
+          const data = proxy.readQuery<Pick<Query, 'items'>, QueryItemsArgs>(
             options
           )
 
@@ -272,7 +303,7 @@ export const useToggleItem = (): ToggleItemReturns => {
             return
           }
 
-          const index = data.list.items?.findIndex(({ id }) => id === itemId)
+          const index = data.items.findIndex(({ id }) => id === itemId)
 
           if (index === undefined) {
             return
@@ -281,12 +312,10 @@ export const useToggleItem = (): ToggleItemReturns => {
           proxy.writeQuery({
             ...options,
             data: update(data, {
-              list: {
-                items: {
-                  [index]: {
-                    complete: {
-                      $set: complete
-                    }
+              items: {
+                [index]: {
+                  complete: {
+                    $set: complete
                   }
                 }
               }
@@ -355,62 +384,61 @@ export const useMoveItem = (): MoveItemReturns => {
       fromIndex: number,
       toIndex: number
     ) => {
-      const fromList = client.readQuery<Pick<Query, 'list'>, QueryListArgs>({
-        query: LIST,
+      const fromList = client.readQuery<Pick<Query, 'items'>, QueryItemsArgs>({
+        query: ITEMS,
         variables: {
           listId: fromListId
         }
       })
 
-      if (!fromList?.list.items) {
+      if (!fromList) {
         return
       }
 
-      const toList = client.readQuery<Pick<Query, 'list'>, QueryListArgs>({
-        query: LIST,
+      const toList = client.readQuery<Pick<Query, 'items'>, QueryItemsArgs>({
+        query: ITEMS,
         variables: {
           listId: toListId
         }
       })
 
-      if (!toList?.list.items) {
+      if (!toList) {
         return
       }
 
-      const item = cloneDeep(fromList.list.items[fromIndex])
+      const item = cloneDeep(fromList.items[fromIndex])
 
-      const nextFromList = helpers.removeItemFromList(fromList.list, fromIndex)
-      const nextToList = helpers.addItemToList(toList.list, item, toIndex)
+      const nextFromList = helpers.removeItem(fromList.items, fromIndex)
+      const nextToList = helpers.addItem(toList.items, item, toIndex)
 
-      const fromOrder = nextFromList.items?.map(({ id }) => id)
-      const toOrder = nextToList.items?.map(({ id }) => id)
+      const fromOrder = nextFromList.map(({ id }) => id)
+      const toOrder = nextToList.map(({ id }) => id)
 
       if (!fromOrder || !toOrder) {
         return
       }
 
-      return mutate({
-        update(proxy) {
-          proxy.writeQuery({
-            data: {
-              list: nextFromList
-            },
-            query: LIST,
-            variables: {
-              listId: fromListId
-            }
-          })
-
-          proxy.writeQuery({
-            data: {
-              list: nextToList
-            },
-            query: LIST,
-            variables: {
-              listId: toListId
-            }
-          })
+      client.writeQuery<Pick<Query, 'items'>, QueryItemsArgs>({
+        data: {
+          items: nextFromList
         },
+        query: ITEMS,
+        variables: {
+          listId: fromListId
+        }
+      })
+
+      client.writeQuery<Pick<Query, 'items'>, QueryItemsArgs>({
+        data: {
+          items: nextToList
+        },
+        query: ITEMS,
+        variables: {
+          listId: toListId
+        }
+      })
+
+      return mutate({
         variables: {
           fromListId,
           fromOrder,

@@ -7,8 +7,7 @@ import {
   Mutation,
   MutationReorderListsArgs,
   MutationSignInArgs,
-  Query,
-  QueryListArgs
+  Query
 } from '../types/graphql'
 import { LISTS } from './lists'
 
@@ -81,7 +80,7 @@ export const useReorderLists = (): ReorderListsReturns => {
 
   const reorderLists = useCallback(
     async (fromIndex: number, toIndex: number) => {
-      const lists = client.readQuery<Pick<Query, 'lists'>, QueryListArgs>({
+      const lists = client.readQuery<Pick<Query, 'lists'>>({
         query: LISTS
       })
 
@@ -93,15 +92,14 @@ export const useReorderLists = (): ReorderListsReturns => {
 
       const order = next.map(({ id }) => id)
 
-      return mutate({
-        update(proxy) {
-          proxy.writeQuery({
-            data: {
-              lists: next
-            },
-            query: LISTS
-          })
+      client.writeQuery<Pick<Query, 'lists'>>({
+        data: {
+          lists: next
         },
+        query: LISTS
+      })
+
+      return mutate({
         variables: {
           order
         }

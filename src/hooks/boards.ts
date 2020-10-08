@@ -110,7 +110,7 @@ export const useCreateBoard = (): CreateBoardReturns => {
         optimisticResponse: {
           createBoard: {
             createdAt: dayjs().toISOString(),
-            id: Math.round(Math.random() * 1000),
+            id: 0,
             name
           }
         },
@@ -316,18 +316,17 @@ export const useReorderBoard = (): ReorderBoardReturns => {
         return
       }
 
-      return mutate({
-        update(proxy) {
-          proxy.writeQuery({
-            data: {
-              board: next
-            },
-            query: BOARD,
-            variables: {
-              boardId
-            }
-          })
+      client.writeQuery<Pick<Query, 'board'>, QueryBoardArgs>({
+        data: {
+          board: next
         },
+        query: BOARD,
+        variables: {
+          boardId
+        }
+      })
+
+      return mutate({
         variables: {
           boardId,
           order

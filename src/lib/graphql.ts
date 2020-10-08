@@ -12,6 +12,7 @@ import { storage } from './storage'
 
 export const client = new ApolloClient({
   cache: new InMemoryCache(),
+  connectToDevTools: process.env.NODE_ENV === 'development',
   link: HttpLink.from([
     onError((error) => {
       const unauthenticated = error.graphQLErrors?.find(

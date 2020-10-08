@@ -15,18 +15,28 @@ class Helpers {
     return Number(id.slice(5))
   }
 
-  removeItemFromList(list: List, index: number): List {
-    const next = cloneDeep(list)
+  reorderItems(items: Item[], fromIndex: number, toIndex: number): Item[] {
+    const next = cloneDeep(items)
 
-    next.items?.splice(index, 1)
+    const [item] = next.splice(fromIndex, 1)
+
+    next.splice(toIndex, 0, item)
 
     return next
   }
 
-  addItemToList(list: List, item: Item, index: number): List {
-    const next = cloneDeep(list)
+  removeItem(items: Item[], index: number): Item[] {
+    const next = cloneDeep(items)
 
-    next.items?.splice(index, 0, item)
+    next.splice(index, 1)
+
+    return next
+  }
+
+  addItem(items: Item[], item: Item, index: number): Item[] {
+    const next = cloneDeep(items)
+
+    next.splice(index, 0, item)
 
     return next
   }

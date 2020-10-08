@@ -14,9 +14,10 @@ import {
   MutationUpdateListArgs,
   Query,
   QueryBoardArgs,
-  QueryListArgs
+  QueryItemsArgs
 } from '../types/graphql'
 import { BOARD } from './boards'
+import { ITEMS } from './items'
 
 export const LISTS = gql`
   query lists {
@@ -40,48 +41,6 @@ export const useLists = (): ListsReturns => {
 
   return {
     lists: data?.lists ?? [],
-    loading,
-    refetch
-  }
-}
-
-export const LIST = gql`
-  query list($listId: Int!) {
-    list(listId: $listId) {
-      id
-      name
-      createdAt
-      items {
-        id
-        body
-        complete
-        description
-        date
-        createdAt
-      }
-    }
-  }
-`
-
-type ListReturns = {
-  list?: List
-  loading: boolean
-
-  refetch: () => void
-}
-
-export const useList = (listId: number): ListReturns => {
-  const { data, loading, refetch } = useQuery<
-    Pick<Query, 'list'>,
-    QueryListArgs
-  >(LIST, {
-    variables: {
-      listId
-    }
-  })
-
-  return {
-    list: data?.list,
     loading,
     refetch
   }
@@ -115,7 +74,7 @@ export const useCreateList = (): CreateListReturns => {
         optimisticResponse: {
           createList: {
             createdAt: dayjs().toISOString(),
-            id: Math.round(Math.random() * 1000),
+            id: 0,
             name
           }
         },
@@ -326,43 +285,42 @@ export const useReorderList = (): ReorderListReturns => {
 
   const reorderList = useCallback(
     async (listId: number, fromIndex: number, toIndex: number) => {
-      const list = client.readQuery<Pick<Query, 'list'>, QueryListArgs>({
-        query: LIST,
+      const items = client.readQuery<Pick<Query, 'items'>, QueryItemsArgs>({
+        query: ITEMS,
         variables: {
           listId
         }
       })
 
-      if (!list?.list.items) {
+      if (!items) {
         return
       }
 
-      const item = cloneDeep(list.list.items[fromIndex])
+      const item = cloneDeep(items.items[fromIndex])
 
-      const next = helpers.addItemToList(
-        helpers.removeItemFromList(list.list, fromIndex),
+      const next = helpers.addItem(
+        helpers.removeItem(items.items, fromIndex),
         item,
         toIndex
       )
 
-      const order = next.items?.map(({ id }) => id)
+      const order = next.map(({ id }) => id)
 
       if (!order) {
         return
       }
 
-      return mutate({
-        update(proxy) {
-          proxy.writeQuery({
-            data: {
-              list: next
-            },
-            query: LIST,
-            variables: {
-              listId: listId
-            }
-          })
+      client.writeQuery<Pick<Query, 'items'>, QueryItemsArgs>({
+        data: {
+          items: next
         },
+        query: ITEMS,
+        variables: {
+          listId: listId
+        }
+      })
+
+      return mutate({
         variables: {
           listId,
           order

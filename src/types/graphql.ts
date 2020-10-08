@@ -15,8 +15,8 @@ export type Query = {
   __typename?: 'Query';
   boards: Array<Board>;
   board: Board;
+  items: Array<Item>;
   lists: Array<List>;
-  list: List;
   profile: User;
 };
 
@@ -26,7 +26,7 @@ export type QueryBoardArgs = {
 };
 
 
-export type QueryListArgs = {
+export type QueryItemsArgs = {
   listId: Scalars['Int'];
 };
 

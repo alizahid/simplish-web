@@ -2,7 +2,7 @@ import { sortBy } from 'lodash'
 import React, { FunctionComponent } from 'react'
 import { Droppable } from 'react-beautiful-dnd'
 
-import { useList } from '../hooks'
+import { useItems } from '../hooks'
 import { styled } from '../stitches.config'
 import { ItemCard } from './item'
 import { Spinner } from './spinner'
@@ -17,9 +17,9 @@ interface Props {
 }
 
 export const ItemList: FunctionComponent<Props> = ({ children, id }) => {
-  const { list } = useList(id)
+  const { items, loading } = useItems(id)
 
-  if (!list) {
+  if (loading) {
     return <Spinner />
   }
 
@@ -29,8 +29,8 @@ export const ItemList: FunctionComponent<Props> = ({ children, id }) => {
         <div ref={innerRef} {...droppableProps}>
           <Main>
             {children}
-            {sortBy(list.items, 'complete').map((item, index) => (
-              <ItemCard index={index} item={item} key={item.id} list={list} />
+            {sortBy(items, 'complete').map((item, index) => (
+              <ItemCard index={index} item={item} key={item.id} listId={id} />
             ))}
           </Main>
           {placeholder}

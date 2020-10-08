@@ -4,7 +4,7 @@ import { Draggable } from 'react-beautiful-dnd'
 
 import { useDeleteItem, useToggleItem, useUpdateItem } from '../hooks'
 import { styled } from '../stitches.config'
-import { Item, List } from '../types/graphql'
+import { Item } from '../types/graphql'
 import { Form } from './form'
 import { Icon } from './icon'
 
@@ -58,10 +58,10 @@ const Actions = styled('div', {
 interface Props {
   index: number
   item: Item
-  list: List
+  listId: number
 }
 
-export const ItemCard: FunctionComponent<Props> = ({ index, item, list }) => {
+export const ItemCard: FunctionComponent<Props> = ({ index, item, listId }) => {
   const { deleteItem } = useDeleteItem()
   const { toggleItem } = useToggleItem()
   const { updateItem } = useUpdateItem()
@@ -104,7 +104,7 @@ export const ItemCard: FunctionComponent<Props> = ({ index, item, list }) => {
                 cursor: 'pointer'
               }}
               icon={item.complete ? 'cross' : 'check'}
-              onClick={() => toggleItem(list.id, item.id, !item.complete)}
+              onClick={() => toggleItem(listId, item.id, !item.complete)}
             />
             <Icon
               css={{
@@ -112,7 +112,7 @@ export const ItemCard: FunctionComponent<Props> = ({ index, item, list }) => {
                 marginLeft: '$half'
               }}
               icon="remove"
-              onClick={() => deleteItem(list.id, item.id)}
+              onClick={() => deleteItem(listId, item.id)}
             />
           </Actions>
         </Main>
