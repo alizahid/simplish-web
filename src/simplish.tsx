@@ -8,11 +8,6 @@ import { Board, Boards, Landing, Lists, SignIn } from './scenes'
 import { darkTheme, styled } from './stitches.config'
 import { useAuth } from './store'
 
-const Layout = styled('div', {
-  display: 'flex',
-  flexDirection: 'column'
-})
-
 const Page = styled('main', {
   display: 'flex',
   flex: 1,
@@ -31,7 +26,7 @@ export const Simplish: FunctionComponent = () => {
   return (
     <ApolloProvider client={client}>
       <BrowserRouter>
-        <Layout>
+        <>
           <Header />
           <Page>
             <Switch>
@@ -58,7 +53,7 @@ export const Simplish: FunctionComponent = () => {
               </Route>
             </Switch>
           </Page>
-        </Layout>
+        </>
       </BrowserRouter>
     </ApolloProvider>
   )
