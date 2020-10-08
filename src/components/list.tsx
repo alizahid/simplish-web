@@ -1,4 +1,3 @@
-import { sortBy } from 'lodash'
 import React, { FunctionComponent } from 'react'
 import { Droppable } from 'react-beautiful-dnd'
 
@@ -29,7 +28,7 @@ export const ItemList: FunctionComponent<Props> = ({ children, id }) => {
         <div ref={innerRef} {...droppableProps}>
           <Main>
             {children}
-            {sortBy(items, 'complete').map((item, index) => (
+            {items.map((item, index) => (
               <ItemCard index={index} item={item} key={item.id} listId={id} />
             ))}
           </Main>
