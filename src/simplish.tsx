@@ -1,10 +1,10 @@
 import { ApolloProvider } from '@apollo/client'
 import React, { FunctionComponent, useEffect } from 'react'
-import { BrowserRouter, Route, Switch } from 'react-router-dom'
+import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom'
 
-import { Header } from './components'
+import { Error, Header } from './components'
 import { client } from './lib'
-import { Board, Boards, Landing, Lists } from './scenes'
+import { Board, Boards, Landing, Lists, SignIn } from './scenes'
 import { darkTheme, styled } from './stitches.config'
 import { useAuth } from './store'
 
@@ -39,21 +39,24 @@ export const Simplish: FunctionComponent = () => {
               <Route exact path="/">
                 <Landing />
               </Route>
-              {loggedIn && (
-                <Route exact path="/boards">
-                  <Boards />
-                </Route>
-              )}
-              {loggedIn && (
-                <Route path="/boards/:id">
-                  <Board />
-                </Route>
-              )}
-              {loggedIn && (
-                <Route path="/lists">
-                  <Lists />
-                </Route>
-              )}
+              <Route exact path="/sign-in">
+                {loggedIn ? <Redirect to="/lists" /> : <SignIn />}
+              </Route>
+              <Route exact path="/boards">
+                {loggedIn ? <Boards /> : <Redirect to="/sign-in" />}
+              </Route>
+              <Route path="/boards/:id">
+                {loggedIn ? <Board /> : <Redirect to="/sign-in" />}
+              </Route>
+              <Route path="/lists">
+                {loggedIn ? <Lists /> : <Redirect to="/sign-in" />}
+              </Route>
+              <Route>
+                <Error
+                  message="We can't find what you're looking for. Someone is on it, though."
+                  title="404"
+                />
+              </Route>
             </Switch>
           </Page>
         </Layout>

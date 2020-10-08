@@ -7,6 +7,7 @@ import {
 import { onError } from '@apollo/client/link/error'
 import { set } from 'lodash'
 
+import { firebase } from './firebase'
 import { storage } from './storage'
 
 export const client = new ApolloClient({
@@ -18,7 +19,11 @@ export const client = new ApolloClient({
       )
 
       if (unauthenticated) {
+        client.clearStore()
+
         storage.clear()
+
+        firebase.auth().signOut()
       }
     }),
     createHttpLink({

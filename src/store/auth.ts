@@ -1,6 +1,6 @@
 import { createHook, createStore, StoreActionApi } from 'react-sweet-state'
 
-import { client, storage } from '../lib'
+import { client, firebase, storage } from '../lib'
 
 type State = {
   loggedIn: boolean
@@ -30,6 +30,8 @@ const actions = {
     await client.clearStore()
 
     storage.remove('@token')
+
+    firebase.auth().signOut()
 
     setState({
       loggedIn: false

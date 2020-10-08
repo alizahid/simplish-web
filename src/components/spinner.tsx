@@ -13,10 +13,10 @@ const rotate = css.keyframes({
 
 const Main = styled('div', {
   animation: `${rotate} 0.5s linear infinite`,
-  borderColor: '$foreground',
+  borderColor: '$foregroundLight',
   borderRadius: '$full',
   borderStyle: 'solid',
-  borderTopColor: 'transparent',
+  borderTopColor: '$foreground',
 
   variants: {
     size: {
