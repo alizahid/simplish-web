@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useState } from 'react'
 
-import { Spinner } from '../components'
+import { Icon, Spinner } from '../components'
 import { useSignIn } from '../hooks'
 import { firebase } from '../lib'
 import { styled } from '../stitches.config'
@@ -8,16 +8,19 @@ import { styled } from '../stitches.config'
 const Title = styled('h1', {
   fontSize: '$title',
   fontWeight: '$semibold',
-  marginBottom: '$space'
+  marginBottom: '$margin'
 })
 
 const Button = styled('a', {
   alignItems: 'center',
   alignSelf: 'flex-start',
   display: 'flex',
-
   div: {
     marginLeft: '$padding'
+  },
+  marginTop: '$margin',
+  svg: {
+    marginRight: '$padding'
   }
 })
 
@@ -56,6 +59,7 @@ export const SignIn: FunctionComponent = () => {
             setFetching(false)
           }
         }}>
+        <Icon icon="google" />
         Sign in with Google
         {(loading || fetching) && <Spinner />}
       </Button>
