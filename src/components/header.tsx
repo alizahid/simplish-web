@@ -1,9 +1,11 @@
-import React, { FunctionComponent } from 'react'
+import React, { FunctionComponent, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 
+import { useBoards } from '../hooks'
 import { styled } from '../stitches.config'
 import { useAuth } from '../store'
 import { Icon } from './icon'
+import { Spinner } from './spinner'
 
 const Main = styled('header', {
   alignItems: 'center',
@@ -47,8 +49,46 @@ const Hyperlink = styled(NavLink, {
   marginLeft: '$margin'
 })
 
+const Menu = styled('div', {
+  position: 'relative'
+})
+
+const MenuItems = styled('div', {
+  display: 'flex',
+  flexDirection: 'column',
+  opacity: 0,
+  paddingTop: '$padding',
+  position: 'absolute',
+  right: 0,
+  top: '100%',
+  transition: '0.2s',
+  variants: {
+    open: {
+      true: {
+        opacity: 1,
+        visibility: 'visible'
+      }
+    }
+  },
+  visibility: 'hidden',
+  zIndex: 10
+})
+
+const MenuItem = styled(NavLink, {
+  '&.active, &:hover': {
+    color: '$foreground'
+  },
+  color: '$foregroundLight',
+  marginTop: '$padding',
+  textAlign: 'right'
+})
+
 export const Header: FunctionComponent = () => {
   const [{ loggedIn, theme }, { logout, setTheme }] = useAuth()
+
+  const { boards, loading } = useBoards()
+
+  const [visible, setVisible] = useState(false)
 
   return (
     <Main>
@@ -67,7 +107,24 @@ export const Header: FunctionComponent = () => {
         {loggedIn ? (
           <>
             <Hyperlink to="/lists">Lists</Hyperlink>
-            <Hyperlink to="/boards">Boards</Hyperlink>
+            <Menu
+              onMouseEnter={() => setVisible(true)}
+              onMouseLeave={() => setVisible(false)}>
+              <Hyperlink to="/boards">Boards</Hyperlink>
+              <MenuItems open={visible}>
+                {loading ? (
+                  <Spinner />
+                ) : (
+                  <>
+                    {boards.map((board) => (
+                      <MenuItem key={board.id} to={`/boards/${board.id}`}>
+                        {board.name}
+                      </MenuItem>
+                    ))}
+                  </>
+                )}
+              </MenuItems>
+            </Menu>
             <Hyperlink
               onClick={(event) => {
                 event.preventDefault()
