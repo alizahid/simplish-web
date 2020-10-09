@@ -1,6 +1,6 @@
 import { cloneDeep } from 'lodash'
 
-import { Board, Item, List } from '../types/graphql'
+import { Item, List } from '../types/graphql'
 
 class Helpers {
   getBoardId(id: string): number {
@@ -47,22 +47,6 @@ class Helpers {
     const [list] = next.splice(fromIndex, 1)
 
     next.splice(toIndex, 0, list)
-
-    return next
-  }
-
-  removeListFromBoard(board: Board, index: number): Board {
-    const next = cloneDeep(board)
-
-    next.lists?.splice(index, 1)
-
-    return next
-  }
-
-  addListToBoard(board: Board, list: List, index: number): Board {
-    const next = cloneDeep(board)
-
-    next.lists?.splice(index, 0, list)
 
     return next
   }

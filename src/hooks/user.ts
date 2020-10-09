@@ -80,9 +80,11 @@ export const useReorderLists = (): ReorderListsReturns => {
 
   const reorderLists = useCallback(
     async (fromIndex: number, toIndex: number) => {
-      const lists = client.readQuery<Pick<Query, 'lists'>>({
+      const options = {
         query: LISTS
-      })
+      }
+
+      const lists = client.readQuery<Pick<Query, 'lists'>>(options)
 
       if (!lists?.lists) {
         return
@@ -92,14 +94,15 @@ export const useReorderLists = (): ReorderListsReturns => {
 
       const order = next.map(({ id }) => id)
 
-      client.writeQuery<Pick<Query, 'lists'>>({
-        data: {
-          lists: next
-        },
-        query: LISTS
-      })
-
       return mutate({
+        update(proxy) {
+          proxy.writeQuery<Pick<Query, 'lists'>>({
+            ...options,
+            data: {
+              lists: next
+            }
+          })
+        },
         variables: {
           order
         }

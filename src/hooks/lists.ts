@@ -13,15 +13,14 @@ import {
   MutationReorderListArgs,
   MutationUpdateListArgs,
   Query,
-  QueryBoardArgs,
-  QueryItemsArgs
+  QueryItemsArgs,
+  QueryListsArgs
 } from '../types/graphql'
-import { BOARD } from './boards'
 import { ITEMS } from './items'
 
 export const LISTS = gql`
-  query lists {
-    lists {
+  query lists($boardId: Int) {
+    lists(boardId: $boardId) {
       id
       name
       createdAt
@@ -36,8 +35,15 @@ type ListsReturns = {
   refetch: () => void
 }
 
-export const useLists = (): ListsReturns => {
-  const { data, loading, refetch } = useQuery<Pick<Query, 'lists'>>(LISTS)
+export const useLists = (boardId?: number): ListsReturns => {
+  const { data, loading, refetch } = useQuery<
+    Pick<Query, 'lists'>,
+    QueryListsArgs
+  >(LISTS, {
+    variables: {
+      boardId
+    }
+  })
 
   return {
     lists: data?.lists ?? [],
@@ -83,40 +89,16 @@ export const useCreateList = (): CreateListReturns => {
             return
           }
 
-          if (boardId) {
-            const options = {
-              query: BOARD,
-              variables: {
-                boardId
-              }
-            }
-
-            const data = proxy.readQuery<Pick<Query, 'board'>, QueryBoardArgs>(
-              options
-            )
-
-            if (!data) {
-              return
-            }
-
-            proxy.writeQuery({
-              ...options,
-              data: update(data, {
-                board: {
-                  lists: {
-                    $push: [response.data.createList]
-                  }
-                }
-              })
-            })
-            return
-          }
-
           const options = {
-            query: LISTS
+            query: LISTS,
+            variables: {
+              boardId
+            }
           }
 
-          const data = proxy.readQuery<Pick<Query, 'lists'>>(options)
+          const data = proxy.readQuery<Pick<Query, 'lists'>, QueryListsArgs>(
+            options
+          )
 
           if (!data) {
             return
@@ -199,7 +181,7 @@ const DELETE_LIST = gql`
 type DeleteListReturns = {
   loading: boolean
 
-  deleteList: (listId: number) => Promise<unknown>
+  deleteList: (listId: number, boardId?: number) => Promise<unknown>
 }
 
 export const useDeleteList = (): DeleteListReturns => {
@@ -213,7 +195,7 @@ export const useDeleteList = (): DeleteListReturns => {
   })
 
   const deleteList = useCallback(
-    async (listId: number) => {
+    async (listId: number, boardId?: number) => {
       const yes = window.confirm('Are you sure you want to delete this list?')
 
       if (!yes) {
@@ -223,10 +205,15 @@ export const useDeleteList = (): DeleteListReturns => {
       return mutate({
         update(proxy) {
           const options = {
-            query: LISTS
+            query: LISTS,
+            variables: {
+              boardId
+            }
           }
 
-          const data = proxy.readQuery<Pick<Query, 'lists'>>(options)
+          const data = proxy.readQuery<Pick<Query, 'lists'>, QueryListsArgs>(
+            options
+          )
 
           if (!data) {
             return
@@ -285,12 +272,16 @@ export const useReorderList = (): ReorderListReturns => {
 
   const reorderList = useCallback(
     async (listId: number, fromIndex: number, toIndex: number) => {
-      const items = client.readQuery<Pick<Query, 'items'>, QueryItemsArgs>({
+      const options = {
         query: ITEMS,
         variables: {
           listId
         }
-      })
+      }
+
+      const items = client.readQuery<Pick<Query, 'items'>, QueryItemsArgs>(
+        options
+      )
 
       if (!items) {
         return
@@ -310,17 +301,15 @@ export const useReorderList = (): ReorderListReturns => {
         return
       }
 
-      client.writeQuery<Pick<Query, 'items'>, QueryItemsArgs>({
-        data: {
-          items: next
-        },
-        query: ITEMS,
-        variables: {
-          listId: listId
-        }
-      })
-
       return mutate({
+        update(proxy) {
+          proxy.writeQuery<Pick<Query, 'items'>, QueryItemsArgs>({
+            ...options,
+            data: {
+              items: next
+            }
+          })
+        },
         variables: {
           listId,
           order

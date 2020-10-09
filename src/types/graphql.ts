@@ -30,6 +30,11 @@ export type QueryItemsArgs = {
   listId: Scalars['Int'];
 };
 
+
+export type QueryListsArgs = {
+  boardId?: Maybe<Scalars['Float']>;
+};
+
 export type Board = {
   __typename?: 'Board';
   id: Scalars['Int'];

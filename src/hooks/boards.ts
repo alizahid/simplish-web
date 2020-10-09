@@ -1,7 +1,6 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
 import dayjs from 'dayjs'
 import update from 'immutability-helper'
-import { cloneDeep } from 'lodash'
 import { useCallback } from 'react'
 
 import { client, helpers } from '../lib'
@@ -13,8 +12,10 @@ import {
   MutationReorderBoardArgs,
   MutationUpdateBoardArgs,
   Query,
-  QueryBoardArgs
+  QueryBoardArgs,
+  QueryListsArgs
 } from '../types/graphql'
+import { LISTS } from './lists'
 
 const BOARDS = gql`
   query boards {
@@ -43,17 +44,12 @@ export const useBoards = (): BoardsReturns => {
   }
 }
 
-export const BOARD = gql`
+const BOARD = gql`
   query board($boardId: Int!) {
     board(boardId: $boardId) {
       id
       name
       createdAt
-      lists {
-        id
-        name
-        createdAt
-      }
     }
   }
 `
@@ -61,24 +57,21 @@ export const BOARD = gql`
 type BoardReturns = {
   board?: Board
   loading: boolean
-
-  refetch: () => void
 }
 
 export const useBoard = (boardId: number): BoardReturns => {
-  const { data, loading, refetch } = useQuery<
-    Pick<Query, 'board'>,
-    QueryBoardArgs
-  >(BOARD, {
-    variables: {
-      boardId
+  const { data, loading } = useQuery<Pick<Query, 'board'>, QueryBoardArgs>(
+    BOARD,
+    {
+      variables: {
+        boardId
+      }
     }
-  })
+  )
 
   return {
     board: data?.board,
-    loading,
-    refetch
+    loading
   }
 }
 
@@ -291,42 +284,34 @@ export const useReorderBoard = (): ReorderBoardReturns => {
 
   const reorderBoard = useCallback(
     async (boardId: number, fromIndex: number, toIndex: number) => {
-      const board = client.readQuery<Pick<Query, 'board'>, QueryBoardArgs>({
-        query: BOARD,
+      const options = {
+        query: LISTS,
         variables: {
           boardId
         }
-      })
-
-      if (!board?.board.lists) {
-        return
       }
 
-      const list = cloneDeep(board.board.lists[fromIndex])
-
-      const next = helpers.addListToBoard(
-        helpers.removeListFromBoard(board.board, fromIndex),
-        list,
-        toIndex
+      const lists = client.readQuery<Pick<Query, 'lists'>, QueryListsArgs>(
+        options
       )
 
-      const order = next.lists?.map(({ id }) => id)
-
-      if (!order) {
+      if (!lists?.lists) {
         return
       }
 
-      client.writeQuery<Pick<Query, 'board'>, QueryBoardArgs>({
-        data: {
-          board: next
-        },
-        query: BOARD,
-        variables: {
-          boardId
-        }
-      })
+      const next = helpers.reorderLists(lists.lists, fromIndex, toIndex)
+
+      const order = next.map(({ id }) => id)
 
       return mutate({
+        update(proxy) {
+          proxy.writeQuery<Pick<Query, 'lists'>, QueryListsArgs>({
+            ...options,
+            data: {
+              lists: next
+            }
+          })
+        },
         variables: {
           boardId,
           order
