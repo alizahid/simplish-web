@@ -3,7 +3,6 @@ import './syntax.scss'
 import { highlight, languages } from 'prismjs'
 import React, { FunctionComponent, useEffect, useState } from 'react'
 import Editor from 'react-simple-code-editor'
-import { useDebouncedCallback } from 'use-debounce'
 
 import 'prismjs/components/prism-typescript'
 
@@ -65,7 +64,7 @@ interface Props {
   snippet?: Snippet
 
   onCreate?: (data: SnippetInput) => void
-  onSave?: (data: SnippetInput) => void
+  onSave?: (snippet: Snippet, data: SnippetInput) => void
 }
 
 export const CodeEditor: FunctionComponent<Props> = ({
@@ -73,18 +72,10 @@ export const CodeEditor: FunctionComponent<Props> = ({
   onSave,
   snippet
 }) => {
-  const [name, setName] = useState('')
-  const [language, setLanguage] = useState('text')
-  const [content, setContent] = useState('')
-  const [tags, setTags] = useState<string[]>([])
-
-  const save = useDebouncedCallback((data: SnippetInput) => {
-    if (!onSave) {
-      return
-    }
-
-    onSave(data)
-  }, 3000)
+  const [name, setName] = useState(snippet?.name ?? '')
+  const [language, setLanguage] = useState(snippet?.language ?? 'text')
+  const [content, setContent] = useState(snippet?.content ?? '')
+  const [tags, setTags] = useState(snippet?.tags ?? [])
 
   useEffect(() => {
     if (snippet) {
@@ -106,32 +97,6 @@ export const CodeEditor: FunctionComponent<Props> = ({
     lineHeight: '$code',
     minHeight: '100%'
   })
-
-  useEffect(() => {
-    if (!snippet) {
-      return
-    }
-
-    if (name === '' || content === '') {
-      return
-    }
-
-    if (
-      content === snippet.content &&
-      language === snippet.language &&
-      name === snippet.name &&
-      tags.join() === snippet.tags.join()
-    ) {
-      return
-    }
-
-    save.callback({
-      content,
-      language,
-      name,
-      tags
-    })
-  }, [name, language, content, tags, snippet, save])
 
   return (
     <Main>
@@ -177,26 +142,37 @@ export const CodeEditor: FunctionComponent<Props> = ({
         onChange={(tags) => setTags(tags)}
         tags={tags}
       />
-      {onCreate && (
-        <Footer>
-          <Button
-            href="#save"
-            onClick={(event) => {
-              event.preventDefault()
+      <Footer>
+        <Button
+          href="#save"
+          onClick={(event) => {
+            event.preventDefault()
 
-              if (name && content) {
-                onCreate({
-                  content,
-                  language,
-                  name,
-                  tags
-                })
-              }
-            }}>
-            Save
-          </Button>
-        </Footer>
-      )}
+            if (!name || !content) {
+              return
+            }
+
+            if (onCreate) {
+              onCreate({
+                content,
+                language,
+                name,
+                tags
+              })
+            }
+
+            if (snippet && onSave) {
+              onSave(snippet, {
+                content,
+                language,
+                name,
+                tags
+              })
+            }
+          }}>
+          Save
+        </Button>
+      </Footer>
     </Main>
   )
 }

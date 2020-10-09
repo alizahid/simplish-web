@@ -63,19 +63,9 @@ export const Snippets: FunctionComponent = () => {
               ({ id }) => id === Number(props.match.params.id)
             )
 
-            if (!snippet) {
-              return <Spinner />
-            }
-
             return (
               <CodeEditor
-                onSave={(data) => {
-                  if (!snippet) {
-                    return
-                  }
-
-                  updateSnippet(snippet, data)
-                }}
+                onSave={(snippet, data) => updateSnippet(snippet, data)}
                 snippet={snippet}
               />
             )
