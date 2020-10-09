@@ -2,7 +2,7 @@ import { ApolloProvider } from '@apollo/client'
 import React, { FunctionComponent, useEffect } from 'react'
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom'
 
-import { Error, Header } from './components'
+import { Header, Message } from './components'
 import { client } from './lib'
 import { Board, Boards, Landing, Lists, SignIn } from './scenes'
 import { darkTheme, styled } from './stitches.config'
@@ -46,7 +46,7 @@ export const Simplish: FunctionComponent = () => {
                 {loggedIn ? <Lists /> : <Redirect to="/sign-in" />}
               </Route>
               <Route>
-                <Error
+                <Message
                   message="We can't find what you're looking for. Someone is on it, though."
                   title="404"
                 />

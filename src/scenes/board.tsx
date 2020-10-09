@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { Error, ItemBoard, Spinner } from '../components'
+import { ItemBoard, Message, Spinner } from '../components'
 import { useBoard, useLists, usePageTitle } from '../hooks'
 
 export const Board: FunctionComponent = () => {
@@ -22,7 +22,7 @@ export const Board: FunctionComponent = () => {
   }
 
   if (!board) {
-    return <Error message="This board doesn't exist." title="Not found" />
+    return <Message message="This board doesn't exist." title="Not found" />
   }
 
   return <ItemBoard boardId={board.id} lists={lists} />

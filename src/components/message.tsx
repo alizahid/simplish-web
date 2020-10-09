@@ -7,7 +7,7 @@ const Title = styled('h1', {
   fontWeight: '$semibold'
 })
 
-const Message = styled('div', {
+const Body = styled('div', {
   marginTop: '$padding'
 })
 
@@ -16,12 +16,12 @@ interface Props {
   title?: string
 }
 
-export const Error: FunctionComponent<Props> = ({
+export const Message: FunctionComponent<Props> = ({
   message,
   title = 'Error'
 }) => (
   <>
     <Title>{title}</Title>
-    <Message>{message}</Message>
+    <Body>{message}</Body>
   </>
 )
