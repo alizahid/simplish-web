@@ -3,7 +3,7 @@ import React, { FunctionComponent, useState } from 'react'
 import { Draggable } from 'react-beautiful-dnd'
 
 import { useDeleteItem, useToggleItem, useUpdateItem } from '../hooks'
-import { styled } from '../stitches.config'
+import { css, styled } from '../stitches.config'
 import { Item } from '../types/graphql'
 import { Form } from './form'
 import { Icon } from './icon'
@@ -72,9 +72,9 @@ export const ItemCard: FunctionComponent<Props> = ({ index, item, listId }) => {
     return (
       <Form
         autoFocus
-        css={{
+        className={css({
           marginBottom: '$margin'
-        }}
+        })}
         item={item}
         onCancel={() => setEditing(false)}
         onItem={(body, date) => {
@@ -100,17 +100,17 @@ export const ItemCard: FunctionComponent<Props> = ({ index, item, listId }) => {
           </Todo>
           <Actions className="item-actions">
             <Icon
-              css={{
+              className={css({
                 cursor: 'pointer'
-              }}
+              })}
               icon={item.complete ? 'cross' : 'check'}
               onClick={() => toggleItem(listId, item.id, !item.complete)}
             />
             <Icon
-              css={{
+              className={css({
                 cursor: 'pointer',
                 marginLeft: '$half'
-              }}
+              })}
               icon="remove"
               onClick={() => deleteItem(listId, item.id)}
             />

@@ -9,7 +9,7 @@ import {
   usePageTitle,
   useUpdateBoard
 } from '../hooks'
-import { styled } from '../stitches.config'
+import { css, styled } from '../stitches.config'
 
 const Item = styled('div', {
   ':hover div': {
@@ -66,10 +66,10 @@ export const Boards: FunctionComponent = () => {
             <Form
               autoFocus
               board={board}
-              css={{
+              className={css({
                 lineHeight: '$regular',
                 width: '$list'
-              }}
+              })}
               onBoard={(name) => {
                 updateBoard(board, name)
 
@@ -84,18 +84,18 @@ export const Boards: FunctionComponent = () => {
           )}
           <Actions>
             <Icon
-              css={{
+              className={css({
                 cursor: 'pointer',
                 marginLeft: '$padding'
-              }}
+              })}
               icon="edit"
               onClick={() => toggleEditing(board.id)}
             />
             <Icon
-              css={{
+              className={css({
                 cursor: 'pointer',
                 marginLeft: '$padding'
-              }}
+              })}
               icon="remove"
               onClick={() => deleteBoard(board.id)}
             />
@@ -104,9 +104,9 @@ export const Boards: FunctionComponent = () => {
       ))}
 
       <Form
-        css={{
+        className={css({
           width: '$list'
-        }}
+        })}
         onBoard={(name) => createBoard(name)}
         placeholder="New board"
         type="board"

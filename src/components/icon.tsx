@@ -1,4 +1,3 @@
-import { TCssProp } from '@stitches/react'
 import React, { FunctionComponent } from 'react'
 
 import { styled } from '../stitches.config'
@@ -18,6 +17,7 @@ const Svg = styled('svg', {
 })
 
 interface Props {
+  className?: string
   color?: string
   icon:
     | 'add'
@@ -29,7 +29,6 @@ interface Props {
     | 'edit'
     | 'google'
   size?: 'small'
-  css?: TCssProp<never>
 
   onClick?: () => void
 }
@@ -79,8 +78,8 @@ const getIcon = (icon: Props['icon']) => {
 }
 
 export const Icon: FunctionComponent<Props> = ({
+  className,
   color,
-  css,
   icon,
   onClick,
   size = 'small'
@@ -89,7 +88,7 @@ export const Icon: FunctionComponent<Props> = ({
 
   return (
     <Svg
-      css={css as Record<string, unknown>}
+      className={className}
       fill={color ?? theme === 'dark' ? '#fff' : '#000'}
       onClick={onClick}
       size={size}

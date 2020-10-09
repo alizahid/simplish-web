@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react'
 import { NavLink } from 'react-router-dom'
 
-import { styled } from '../stitches.config'
+import { css, styled } from '../stitches.config'
 import { Snippet } from '../types/graphql'
 import { Icon } from './icon'
 
@@ -60,9 +60,9 @@ export const Snippets: FunctionComponent<Props> = ({ onDelete, snippets }) => (
         {snippet.name}
         <Actions className="item-actions">
           <Icon
-            css={{
+            className={css({
               cursor: 'pointer'
-            }}
+            })}
             icon="remove"
             onClick={() => onDelete(snippet.id)}
           />

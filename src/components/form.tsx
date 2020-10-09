@@ -1,4 +1,3 @@
-import { TCssProp } from '@stitches/react'
 import { parseDate } from 'chrono-node'
 import dayjs from 'dayjs'
 import React, { FunctionComponent, useEffect, useRef, useState } from 'react'
@@ -31,7 +30,7 @@ const Input = styled('input', {
 interface Props {
   autoFocus?: boolean
   board?: Board
-  css?: TCssProp<never>
+  className?: string
   item?: Item
   list?: List
   placeholder?: string
@@ -46,7 +45,7 @@ interface Props {
 export const Form: FunctionComponent<Props> = ({
   autoFocus,
   board,
-  css,
+  className,
   item,
   list,
   onBoard,
@@ -111,9 +110,15 @@ export const Form: FunctionComponent<Props> = ({
     }
   }
 
+  const dateStyles = {
+    fontSize: '$small',
+    lineHeight: '$small',
+    marginTop: '$half'
+  }
+
   return (
     <Main
-      css={css as Record<string, unknown>}
+      className={className}
       onSubmit={(event) => {
         event.preventDefault()
 
@@ -123,6 +128,11 @@ export const Form: FunctionComponent<Props> = ({
       <Input
         autoFocus={autoFocus}
         onChange={(event) => setText(event.target.value)}
+        onKeyDown={(event) => {
+          if (onCancel && event.key === 'Escape') {
+            onCancel()
+          }
+        }}
         placeholder={placeholder}
         type="text"
         value={text}
@@ -130,12 +140,13 @@ export const Form: FunctionComponent<Props> = ({
       {type === 'item' && (
         <>
           <Input
-            css={{
-              fontSize: '$small',
-              lineHeight: '$small',
-              marginTop: '$half'
-            }}
+            css={dateStyles}
             onChange={(event) => setDate(event.target.value)}
+            onKeyDown={(event) => {
+              if (onCancel && event.key === 'Escape') {
+                onCancel()
+              }
+            }}
             placeholder="Add date: eg, tomorrow at noon"
             type="text"
             value={date}

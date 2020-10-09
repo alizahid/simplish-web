@@ -12,7 +12,7 @@ import {
   useUpdateList
 } from '../hooks'
 import { helpers } from '../lib'
-import { styled } from '../stitches.config'
+import { css, styled } from '../stitches.config'
 import { List } from '../types/graphql'
 import { Form } from './form'
 import { Icon } from './icon'
@@ -171,13 +171,13 @@ export const ItemBoard: FunctionComponent<Props> = ({ boardId, lists }) => {
                         {editing.get(list.id) ? (
                           <Form
                             autoFocus
-                            css={{
+                            className={css({
                               input: {
                                 fontSize: '$subtitle',
                                 fontWeight: '$medium',
                                 lineHeight: '$subtitle'
                               }
-                            }}
+                            })}
                             list={list}
                             onCancel={() => toggleEditing(list.id)}
                             onList={(name) => {
@@ -194,18 +194,20 @@ export const ItemBoard: FunctionComponent<Props> = ({ boardId, lists }) => {
                           </Title>
                         )}
                         <Actions className="list-actions">
+                          {!adding.get(list.id) && (
+                            <Icon
+                              className={css({
+                                cursor: 'pointer'
+                              })}
+                              icon="add"
+                              onClick={() => toggleAdding(list.id)}
+                            />
+                          )}
                           <Icon
-                            css={{
-                              cursor: 'pointer'
-                            }}
-                            icon={adding.get(list.id) ? 'cross' : 'add'}
-                            onClick={() => toggleAdding(list.id)}
-                          />
-                          <Icon
-                            css={{
+                            className={css({
                               cursor: 'pointer',
                               marginLeft: '$padding'
-                            }}
+                            })}
                             icon="remove"
                             onClick={() => deleteList(list.id)}
                           />
@@ -215,10 +217,10 @@ export const ItemBoard: FunctionComponent<Props> = ({ boardId, lists }) => {
                         {adding.get(list.id) && (
                           <Form
                             autoFocus
-                            css={{
+                            className={css({
                               marginBottom: '$margin',
                               width: '$list'
-                            }}
+                            })}
                             onCancel={() => toggleAdding(list.id)}
                             onItem={(body, date) => {
                               createItem(list.id, {
@@ -239,12 +241,12 @@ export const ItemBoard: FunctionComponent<Props> = ({ boardId, lists }) => {
               ))}
               {placeholder}
               <Form
-                css={{
+                className={css({
                   alignSelf: 'flex-start',
                   marginLeft: '$margin',
                   marginRight: '$margin',
                   width: '$list'
-                }}
+                })}
                 onList={(name) => createList(name, boardId)}
                 placeholder="New list"
                 type="list"

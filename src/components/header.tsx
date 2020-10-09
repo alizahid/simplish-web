@@ -2,7 +2,7 @@ import React, { FunctionComponent, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 
 import { useBoards } from '../hooks'
-import { styled } from '../stitches.config'
+import { css, styled } from '../stitches.config'
 import { useAuth } from '../store'
 import { Icon } from './icon'
 import { Spinner } from './spinner'
@@ -98,9 +98,9 @@ export const Header: FunctionComponent = () => {
       </Simplish>
       <Nav>
         <Icon
-          css={{
+          className={css({
             cursor: 'pointer'
-          }}
+          })}
           icon={theme === 'dark' ? 'sun' : 'moon'}
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
         />
