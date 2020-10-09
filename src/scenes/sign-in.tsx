@@ -6,6 +6,7 @@ import { firebase } from '../lib'
 import { styled } from '../stitches.config'
 
 const Title = styled('h1', {
+  color: '$foreground',
   fontSize: '$title',
   fontWeight: '$semibold',
   marginBottom: '$margin'
