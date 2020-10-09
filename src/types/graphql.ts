@@ -17,6 +17,7 @@ export type Query = {
   board: Board;
   items: Array<Item>;
   lists: Array<List>;
+  snippets: Array<Snippet>;
   profile: User;
 };
 
@@ -32,7 +33,7 @@ export type QueryItemsArgs = {
 
 
 export type QueryListsArgs = {
-  boardId?: Maybe<Scalars['Float']>;
+  boardId?: Maybe<Scalars['Int']>;
 };
 
 export type Board = {
@@ -81,6 +82,16 @@ export type Comment = {
   createdAt: Scalars['DateTime'];
 };
 
+export type Snippet = {
+  __typename?: 'Snippet';
+  id: Scalars['Int'];
+  name: Scalars['String'];
+  language: Scalars['String'];
+  content: Scalars['String'];
+  tags: Array<Scalars['String']>;
+  createdAt: Scalars['DateTime'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   createBoard: Board;
@@ -96,6 +107,9 @@ export type Mutation = {
   updateList: List;
   deleteList: Scalars['Boolean'];
   reorderList: Scalars['Boolean'];
+  createSnippet: Snippet;
+  updateSnippet: Snippet;
+  deleteSnippet: Scalars['Boolean'];
   signIn: AuthResult;
   updatePushToken: Scalars['Boolean'];
   reorderLists: Scalars['Boolean'];
@@ -179,6 +193,22 @@ export type MutationReorderListArgs = {
 };
 
 
+export type MutationCreateSnippetArgs = {
+  data: SnippetInput;
+};
+
+
+export type MutationUpdateSnippetArgs = {
+  data: SnippetInput;
+  snippetId: Scalars['Int'];
+};
+
+
+export type MutationDeleteSnippetArgs = {
+  snippetId: Scalars['Int'];
+};
+
+
 export type MutationSignInArgs = {
   token: Scalars['String'];
 };
@@ -197,6 +227,13 @@ export type ItemInput = {
   body: Scalars['String'];
   description?: Maybe<Scalars['String']>;
   date?: Maybe<Scalars['String']>;
+};
+
+export type SnippetInput = {
+  name: Scalars['String'];
+  language: Scalars['String'];
+  content: Scalars['String'];
+  tags: Array<Scalars['String']>;
 };
 
 export type AuthResult = {

@@ -4,7 +4,7 @@ import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom'
 
 import { Header, Message } from './components'
 import { client } from './lib'
-import { Board, Boards, Landing, Lists, SignIn } from './scenes'
+import { Board, Boards, Landing, Lists, SignIn, Snippets } from './scenes'
 import { darkTheme, styled } from './stitches.config'
 import { useAuth } from './store'
 
@@ -44,6 +44,9 @@ export const Simplish: FunctionComponent = () => {
               </Route>
               <Route path="/lists">
                 {loggedIn ? <Lists /> : <Redirect to="/sign-in" />}
+              </Route>
+              <Route path="/snippets">
+                {loggedIn ? <Snippets /> : <Redirect to="/sign-in" />}
               </Route>
               <Route>
                 <Message

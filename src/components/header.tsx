@@ -125,6 +125,7 @@ export const Header: FunctionComponent = () => {
                 )}
               </MenuItems>
             </Menu>
+            <Hyperlink to="/snippets">Snippets</Hyperlink>
             <Hyperlink
               onClick={(event) => {
                 event.preventDefault()

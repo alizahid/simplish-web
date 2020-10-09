@@ -27,9 +27,11 @@ export const { css, styled } = createStyled({
       $semibold: '600'
     },
     fonts: {
+      $mono: 'IBM Plex Mono, Consolas, monospace',
       $sans: 'Inter, apple-system, sans-serif'
     },
     lineHeights: {
+      $code: '1.6rem',
       $regular: '1.5rem',
       $small: '1rem',
       $subtitle: '2rem',
